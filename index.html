@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live TV - JS Extract</title>
+    <title>Live TV - Extracted Channels</title>
     
     <link rel="icon" type="image/png" sizes="512x512" href="https://img.icons8.com/fluency/512/play.png">
-    <meta name="apple-mobile-web-app-title" content="Sports">
+    <meta name="apple-mobile-web-app-title" content="Sports Hub">
 
     <!-- مكتبة JW Player -->
     <script src="https://content.jwplatform.com/libraries/SAHhwvZq.js"></script>
@@ -84,14 +84,49 @@
 
     <script>
         var channels = [
-            { name: "tnt1", url: "https://otte.cache.aiv-cdn.net/iad-nitro/live/clients/dash/enc/rhf2dwosdt/out/v1/ee550d2a68d846c797e6ce4de2e8b76d/cenc.mpd", k1: "69a5aa835a061ce64a630d1046727e40", k2: "d02feac8a999bd06bf4059bf33411749", cat: "Live Sports" },
-            { name: "tnt1+", url: "https://abkyrm4aaaaaaaamfyfksth3wr44v.ta.bia-cf.live.pv-cdn.net/fra-nitro/live/clients/dash/enc/rhf2dwosdt/out/v1/ee550d2a68d846c797e6ce4de2e8b76d/cenc.mpd", k1: "69a5aa835a061ce64a630d1046727e40", k2: "d02feac8a999bd06bf4059bf33411749", cat: "Live Sports" },
-            { name: "tnt2", url: "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/puehlftk5j/out/v1/f7f0da1ee112481ca0024e6d4dd97f4a/cenc.mpd", k1: "0b59ce06de74ed84f2eda5e81dadba13", k2: "48e4ba4ad6c2a60d2bda5d71a0050844", cat: "Live Sports" },
-            { name: "tnt2+", url: "https://otte-qw.live.pv-cdn.net/fra-nitro/live/clients/dash/enc/3j04z3pbit/out/v1/042ee0757ed348bf8c26f75895cae871/cenc.mpd", k1: "0b59ce06de74ed84f2eda5e81dadba13", k2: "48e4ba4ad6c2a60d2bda5d71a0050844", cat: "Live Sports" },
-            { name: "tnt3", url: "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/2szrn2y3ep/out/v1/eacd8a4207dc4f0d9661a4b085b8fdd9/cenc.mpd", k1: "12413e2c2855cfc59ce0fe6b20cc71ca", k2: "08d55a8f5fc93a9375f9b0cb2e1739ca", cat: "Live Sports" },
-            { name: "tnt3+", url: "https://abkyrm4aaaaaaaamfyfksth3wr44v.ta.bia-cf.live.pv-cdn.net/iad-nitro/live/clients/dash/enc/2szrn2y3ep/out/v1/eacd8a4207dc4f0d9661a4b085b8fdd9/cenc.mpd", k1: "12413e2c2855cfc59ce0fe6b20cc71ca", k2: "08d55a8f5fc93a9375f9b0cb2e1739ca", cat: "Live Sports" },
-            { name: "tnt4", url: "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/65ldy4ejuu/out/v1/69bc6b64f1c14e36bb21e0075a71d8ca/cenc.mpd", k1: "570c19f1be3410e4e409be4dc7923f2b", k2: "9a4dea8af2a2a703dffa8a477e9edc50", cat: "Live Sports" },
-            { name: "tnt4+", url: "https://otte-qw.live.pv-cdn.net/fra-nitro/live/clients/dash/enc/65ldy4ejuu/out/v1/69bc6b64f1c14e36bb21e0075a71d8ca/cenc.mpd", k1: "570c19f1be3410e4e409be4dc7923f2b", k2: "9a4dea8af2a2a703dffa8a477e9edc50", cat: "Live Sports" }, 
+            { name: "beinsport2", url: "https://a151aivottlinear-a.akamaihd.net/OTTB/sin-nitro/live/dash/enc/8m8cd46i1t/out/v1/83985c68e4174e90a58a1f2c024be4c9/cenc.mpd", cat: "Live Sports", k1: "0b42be2664d7e811d04f3e504e0924c5", k2: "ae24090123b8c72ac5404dc152847cb8" },
+            { name: "beinsport3", url: "https://a151aivottlinear-a.akamaihd.net/OTTB/sin-nitro/live/dash/enc/q4u5nwaogz/out/v1/18de6d3e65934f3a8de4358e69eab86c/cenc.mpd", cat: "Live Sports", k1: "7995c724a13748ed970840a8ab5bb9b3", k2: "67bdaf1e2175b9ff682fcdf0e2354b1e" },
+            { name: "cbs Sports", url: "https://a151aivottlinear-a.akamaihd.net/OTTB/sin-nitro/live/dash/enc/5qz8wmdome/out/v1/b9323e853dce427eac214b77bd48a204/cenc.mpd", cat: "Live Sports", k1: "d9623774ac5c8c351aafe97c5fe70267", k2: "5164e6d05164a2d65fa8fcc962aa4861" },
+            { name: "criclife", url: "https://live-oneapp-prd-news.akamaized.net/Content/CMAF_OL2-CTR-4s/Live/channel(universo-east)/master.mpd", cat: "Live Sports", k1: "96b67fa09140329a89b7a1ead134eda3", k2: "c618d32c56cdc6cad8330eb98507ca3f" },
+            { name: "Fancode", url: "https://a204aivottepl-a.akamaihd.net/sin-nitro/live/clients/dash/enc/h35gev6jft/out/v1/c64004e114c245a4ab84bb570275a4a9/cenc.mpd", cat: "Live Sports", k1: "065051b99bf5cf8d9a3bde5cbde6aaf9", k2: "214bd176832872339ce184338320f9a2" },
+            { name: "Fancode2", url: "https://a204aivottepl-a.akamaihd.net/sin-nitro/live/clients/dash/enc/h35gev6jft/out/v1/c64004e114c245a4ab84bb570275a4a9/cenc.mpd", cat: "Live Sports", k1: "065051b99bf5cf8d9a3bde5cbde6aaf9", k2: "214bd176832872339ce184338320f9a2" },
+            { name: "Fox501", url: "https://in-mc-flive.fancode.com/mumbai/143353_hindi_dash_66824_1drmta-di_h264/index.mpd", cat: "Live Sports", k1: "c108e7b44a1d4e65bd9edf19b46e5ec1", k2: "" },
+            { name: "fubosport", url: "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/3b7qwiqzk3/out/v1/9f14895badca43e6a716db021dcd0c31/cenc.mpd", cat: "Live Sports", k1: "dc69b6159a0f9f0a4e03b3ff91cbacd5", k2: "d0dcbcd7723bc40df0bf34c9c092d51f" },
+            { name: "hindi", url: "https://sundirectgo-live.pc.cdn.bitgravity.com/svchd18/dth.mpd", cat: "Live Sports", k1: "", k2: "" },
+            { name: "Hub", url: "https://svc45.main.sl.t-online.de/bpk-tv/KID01037_FUSSBALLTV1_uhd/DASH/index.mpd", cat: "Live Sports", k1: "1f09d5788fbbb03a053d03cc731f31a9", k2: "" },
+            { name: "kayosport", url: "https://dck1-fs-live.dtcdn.dazn.com/out/v1/761f422bb93edb7b/b950ea05fb764eea969d5d9b28271ef8/index.mpd?", cat: "Live Sports", k1: "03b7771184005501ba6d66c24eac1414", k2: "" },
+            { name: "LaligaTv", url: "https://a151aivottlinear-a.akamaihd.net/OTTB/sin-nitro/live/dash/enc/k0duzgfejg/out/v1/70a50b1bda944628b8e7e66ab4069419/cenc.mpd", cat: "Live Sports", k1: "620e51b82596475517a27aa425c52280", k2: "2b9ba811e9c5aeafc8ae1b71cdca4d6a" },
+            { name: "PL1", url: "https://sundirectgo-live.pc.cdn.bitgravity.com/svchd18/dth.mpd", cat: "Live Sports", k1: "e08ade1eb5c0ce1ccbd9d8dfa4860409", k2: "d5a557c984227122649f8c94d5ef2b86" },
+            { name: "PL2", url: "https://sundirectgo-live.pc.cdn.bitgravity.com/svchd14/dth.mpd", cat: "Live Sports", k1: "128d616247ecfba91bcd5744d0df1dc5", k2: "bc146f6794d0cb5298e71bbe2c0cd41c" },
+            { name: "PL4", url: "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/fsu3wl2rwb/out/v1/be61206c04e643349d53fb22301f3b50/cenc.mpd", cat: "Live Sports", k1: "5466ebd70704bdeb657f0abf3c5ca4ef", k2: "bdd79b72d8e48ed483aa623cc38a8a16" },
+            { name: "pl5", url: "https://estreams.tv.nej.cz/dash/CH_TVP_SPORT_Portable.ism/playlist.mpd", cat: "Live Sports" },
+            { name: "premiersport", url: "https://a151aivottlinear-a.akamaihd.net/OTTB/sin-nitro/live/dash/enc/bcj3iscpd6/out/v1/fcd137b391214f7cb99dd4d7be90ca87/cenc.mpd", cat: "Live Sports", k1: "1a5df53609ebc9857898c490f4724918", k2: "77f62980d582ec541280796acf8b2d19" },
+            { name: "PremierSport1", url: "https://a151aivottlinear-a.akamaihd.net/OTTB/sin-nitro/live/dash/enc/m6sqanvm2m/out/v1/f6beb46c6e9a4132ad739f3ca27df6aa/cenc.mpd", cat: "Live Sports", k1: "1444f4235529f183f0a5a486befe9cdb", k2: "e5e3fec67a1bb3472a2089c8a0a2557f" },
+            { name: "ptv", url: "https://ottlive.dishhome.com.np/protected/jQTOzZkB0RDJ74Ryniuo/dash/manifest.mpd", cat: "Live Sports", k1: "a7712196dbee413ab510c825e5c4d3f0", k2: "1ade126fa6a9162ba34bd5de5b1427ca" },
+            { name: "Sony1", url: "https://jiotvmblive.cdn.jio.com/bpk-tv/Ten3_HD_MOB/WDVLive/index.mpd", cat: "Live Sports", k1: "111e6908b965566e97139efddf7ef459", k2: "c87903abbc052e1f21e51ebd928d9cb1" },
+            { name: "Sony5", url: "https://iptv.jio.com/livetv/data/Star_Utsav.mpd", cat: "Live Sports", k1: "433ffba670963e70857859a9dff4be04", k2: "51ede3a821229fe81e71282c8eff80e3" },
+            { name: "star1-english", url: "https://bpaita2.akamaized.net/bpk-tv/irdeto_com_Channel_250/output/manifest.mpd", cat: "Live Sports" },
+            { name: "star1-hindi", url: "https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_HD1_Hindi_BTS/WDVLive/index.mpd", cat: "Live Sports", k1: "400131994b445d8c8817202248760fda", k2: "" },
+            { name: "Star1-Telegu", url: "https://jiotvpllive.cdn.jio.com/bpk-tv/Star_Sports_1_Telugu_HD_BTS/WDVLive/index.mpd", cat: "Live Sports", k1: "9a6d058fa40b5460a946178900eb44cb", k2: "" },
+            { name: "Tnt1", url: "https://abkyrm4aaaaaaaamfyfksth3wr44v.ta.bia-cf.live.pv-cdn.net/fra-nitro/live/clients/dash/enc/rhf2dwosdt/out/v1/ee550d2a68d846c797e6ce4de2e8b76d/cenc.mpd", cat: "Live Sports", k1: "69a5aa835a061ce64a630d1046727e40", k2: "" },
+            { name: "Tnt2", url: "https://otte-qw.live.pv-cdn.net/fra-nitro/live/clients/dash/enc/3j04z3pbit/out/v1/042ee0757ed348bf8c26f75895cae871/cenc.mpd", cat: "Live Sports", k1: "0b59ce06de74ed84f2eda5e81dadba13", k2: "" },
+            { name: "Tnt3", url: "https://abkyrm4aaaaaaaamfyfksth3wr44v.ta.bia-cf.live.pv-cdn.net/iad-nitro/live/clients/dash/enc/2szrn2y3ep/out/v1/eacd8a4207dc4f0d9661a4b085b8fdd9/cenc.mpd", cat: "Live Sports", k1: "12413e2c2855cfc59ce0fe6b20cc71ca", k2: "08d55a8f5fc93a9375f9b0cb2e1739ca" },
+            { name: "Tnt4", url: "https://otte-qw.live.pv-cdn.net/fra-nitro/live/clients/dash/enc/65ldy4ejuu/out/v1/69bc6b64f1c14e36bb21e0075a71d8ca/cenc.mpd", cat: "Live Sports", k1: "570c19f1be3410e4e409be4dc7923f2b", k2: "" },
+            { name: "Tsn", url: "https://otte-qw.live.pv-cdn.net/bom-nitro/live/clients/dash/enc/w0rehjjrwe/out/v1/69a2a7041395406b970598f61680e7cf/cenc.mpd", cat: "Live Sports" },
+            { name: "WC1", url: "https://otte.live.fly.ww.aiv-cdn.net/fra-nitro/live/clients/dash/enc/rhf2dwosdt/out/v1/ee550d2a68d846c797e6ce4de2e8b76d/cenc.mpd", cat: "Live Sports", k1: "69a5aa835a061ce64a630d1046727e40", k2: "" },
+            { name: "WC2", url: "https://otte-qw.live.pv-cdn.net/pdx-nitro/live/clients/dash/enc/ajfoeddkbz/out/v1/b78800b9b2304879b15843f455836829/cenc.mpd", cat: "Live Sports", k1: "f6564ec2aee819046328a0e153be574d", k2: "ff46a8a1031eb27ef22576a077c98ab7" },
+            { name: "WC3", url: "https://simplitv-live.mdn.ors.at/live/eds/zdf_hd/dash4h/zdf_hd.mpd", cat: "Live Sports", k1: "c1a0ac1044a433d0856ccdc08f245084", k2: "7f0e8800a6d63d7915ac181bb88ce813" },
+            { name: "WC4", url: "https://live-oneapp-prd-news.akamaized.net/Content/CMAF_OL2-CTR-4s/Live/channel(WSNS)/master.mpd", cat: "Live Sports", k1: "7d6bb9f86e133e4cb33440b493b6b672", k2: "584ad285dcb9e7d42cf3e93f1cc3fe11" },
+            { name: "WC5", url: "https://live.vrtcdn.be/groupd/live/0761024f-37fe-4254-bc37-e95d7c62b2d1/live.isml/.mpd", cat: "Live Sports", k1: "893bc63340876605f52886a42e0ccce5", k2: "d6c46d2d691056fbd091bf1f01b21a91" },
+            { name: "WC6", url: "https://otte-tim.live.pv-cdn.net/gru-nitro/live/clients/dash/enc/iayg0kyrof/out/v1/91dc04907f56415b897faccfa9d252da/cenc.mpd", cat: "Live Sports", k1: "1223d5105392cabf1bb9c2c1fdf6539a", k2: "340b409f4b8f78a343e0363a7938df38" },
+            { name: "WC7", url: "https://a151aivottlinear-a.akamaihd.net/OTTB/sin-nitro/live/dash/enc/m7duvnk2bu/out/v1/d1ad69118b5647309b1eb7213affdb3d/cenc.mpd", cat: "Live Sports", k1: "4bbcff3289d457b4dd5dbdd21221de9a", k2: "c4906b9a9f8dda3c0725bddb8c497733" },
+            { name: "WC8", url: "https://live-oneapp-prd-news.akamaized.net/Content/CMAF_OL2-CTR-4s/Live/channel(WSNS)/master.mpd", cat: "Live Sports", k1: "7d6bb9f86e133e4cb33440b493b6b672", k2: "584ad285dcb9e7d42cf3e93f1cc3fe11" },
+            { name: "WC9", url: "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/ubehitlwzo/out/v1/8e09c381a51f4366a19e979418112e8f/cenc.mpd", cat: "Live Sports", k1: "a7d11d37a1f7611ee88d4db880171f32", k2: "" },
+            { name: "WC10", url: "https://live.vrtcdn.be/groupd/live/0761024f-37fe-4254-bc37-e95d7c62b2d1/live.isml/.mpd", cat: "Live Sports", k1: "893bc63340876605f52886a42e0ccce5", k2: "d6c46d2d691056fbd091bf1f01b21a91" },
+            { name: "WC11", url: "https://c9851ec-rbm-hilv-fsly.cdn.redbee.live/L26/6b640fa2/a765d074.isml/dash/.mpd", cat: "Live Sports", k1: "adca25b8779e4168a0cd710f59f61ccf", k2: "be5383ed3cd8079f4ffe78ad067f476a" },
+            { name: "Willow Cricbuzz", url: "https://otte.cache.aiv-cdn.net/iad-nitro/live/clients/enc/dtyyswyqxt/out/v1/6706270f291145aaa388903d32c6cd6f/cenc.mpd", cat: "Live Sports", k1: "b9d942f08fa157e355701dd5d6f0bd32", k2: "32b949d60fd1fd73002e0286a5225ead" },
+            { name: "willow-cricbuzz", url: "https://abfjk4haaaaaaaampv6ofhkihi4r6.bia-cf.live.pv-cdn.net/iad-nitro/live/clients/dash/enc/axzzkdukfy/out/v1/3ae01320c1cb4853bd48e575e3699b3e/cenc.mpd", cat: "Live Sports", k1: "8989ef2e334dacc8b77de15f31152701", k2: "180dc5513532d500bac8813715a95b48" },
+            { name: "willow", url: "https://otte.cache.aiv-cdn.net/bom-nitro/live/clients/dash/enc/tll6uwepxa/out/v1/a7f67cbb33df46539312956427343886/cenc.mpd", cat: "Live Sports", k1: "290e09c837da78d5cd961978d390515c", k2: "b748836c71e6a4ca68ef5b5652db6247" }
         ];
 
         var playerInstance = null;
@@ -134,7 +169,7 @@
 
         function playChannel(index) {
             if (typeof jwplayer === 'undefined') {
-                document.getElementById('player').innerHTML = '<h3 style="color:#ff4d4d; text-align:center; margin-top:20%; font-family:tahoma;">تم حظر مشغل الفيديو!<br>يرجى إيقاف مانع الإعلانات (AdBlock) وعمل تحديث.</h3>';
+                document.getElementById('player').innerHTML = '<h3 style="color:#ff4d4d; text-align:center; margin-top:20%; font-family:tahoma;">تم حظر مشغل الفيديو!<br>يرجى إيقاف مانع الإعلانات (AdBlock).</h3>';
                 return;
             }
 
@@ -144,12 +179,9 @@
             var activeBtn = document.getElementById("btn-" + index);
             if(activeBtn) activeBtn.classList.add("active");
 
-            var cleanUrl = channel.url.split('|')[0];
-            cleanUrl = cleanUrl.split('?')[0]; // تنظيف إضافي للروابط
-
             var setupConfig = {
-                file: cleanUrl,
-                type: cleanUrl.indexOf(".m3u8") !== -1 || cleanUrl.indexOf(".ts") !== -1 ? "hls" : "dash",
+                file: channel.url,
+                type: channel.url.indexOf(".m3u8") !== -1 || channel.url.indexOf(".ts") !== -1 ? "hls" : "dash",
                 width: "100%", height: "100%",
                 autostart: true, preload: "auto", stretching: "uniform"
             };
@@ -157,8 +189,6 @@
             // إعدادات التشفير السليمة
             if (channel.k1 && channel.k2) {
                 setupConfig.drm = { clearkey: { keyId: channel.k1, key: channel.k2 } };
-            } else if (channel.widevine) {
-                setupConfig.drm = { widevine: { url: channel.widevine } };
             }
 
             playerInstance = jwplayer("player").setup(setupConfig);
