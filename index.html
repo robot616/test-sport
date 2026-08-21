@@ -3,52 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live TV - Extracted Channels</title>
+    <title>Live TV - Proxy HLS</title>
     
     <link rel="icon" type="image/png" sizes="512x512" href="https://img.icons8.com/fluency/512/play.png">
-    <meta name="apple-mobile-web-app-title" content="Sports Hub">
-
-    <!-- مكتبة Clappr كبديل قوي ومجاني لتشغيل قنوات IPTV / M3U8 -->
-    <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+    
+    <!-- مكتبة HLS.js الأساسية لتشغيل البث -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <style>
-        html, body {
-            margin: 0; padding: 0;
-            width: 100vw; height: 100vh;
-            background: #0f0f0f; color: #fff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-        }
+        html, body { margin: 0; padding: 0; width: 100vw; height: 100vh; background: #0f0f0f; color: #fff; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; }
         .app-container { display: flex; width: 100vw; height: 100vh; flex-direction: row; }
-        .sidebar {
-            width: 320px; background: #181818;
-            border-left: 1px solid #333; display: flex; flex-direction: column; z-index: 10;
-        }
+        .sidebar { width: 320px; background: #181818; border-left: 1px solid #333; display: flex; flex-direction: column; z-index: 10; }
         .search-box { padding: 15px; background: #222; border-bottom: 1px solid #333; }
-        .search-box input {
-            width: 100%; padding: 12px; background: #111; border: 1px solid #444;
-            color: #fff; border-radius: 6px; font-size: 14px; box-sizing: border-box; outline: none;
-        }
+        .search-box input { width: 100%; padding: 12px; background: #111; border: 1px solid #444; color: #fff; border-radius: 6px; font-size: 14px; box-sizing: border-box; outline: none; }
         .search-box input:focus { border-color: #1dcf60; }
         .channel-list { flex: 1; overflow-y: auto; padding: 10px; }
         .channel-list::-webkit-scrollbar { width: 6px; }
         .channel-list::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
-        
-        .category-header {
-            color: #1dcf60; font-size: 15px; font-weight: bold;
-            padding: 10px; border-right: 3px solid #1dcf60;
-            background: #112b1a; border-radius: 4px; margin-bottom: 5px; margin-top: 15px;
-        }
-
-        .channel-btn {
-            background: #222; padding: 12px 15px; margin-bottom: 5px; border-radius: 6px;
-            cursor: pointer; font-weight: bold; font-size: 13px; transition: all 0.2s ease;
-            display: flex; align-items: center; justify-content: space-between;
-        }
+        .category-header { color: #1dcf60; font-size: 15px; font-weight: bold; padding: 10px; border-right: 3px solid #1dcf60; background: #112b1a; border-radius: 4px; margin-bottom: 5px; margin-top: 15px; }
+        .channel-btn { background: #222; padding: 12px 15px; margin-bottom: 5px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: all 0.2s ease; display: flex; align-items: center; justify-content: space-between; }
         .channel-btn:hover { background: #333; }
         .channel-btn.active { background: #1dcf60; color: #fff; }
-        .player-wrapper { flex: 1; position: relative; background: #000; }
-        #player { position: absolute !important; top: 0; right: 0; bottom: 0; left: 0; width: 100% !important; height: 100% !important; }
+        .player-wrapper { flex: 1; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
+        
+        #video-player { width: 100%; height: 100%; background: #000; outline: none; }
         
         @media (max-width: 768px) {
             .app-container { flex-direction: column; }
@@ -61,7 +39,8 @@
 
     <div class="app-container">
         <div class="player-wrapper">
-            <div id="player"></div>
+            <!-- مشغل الفيديو الافتراضي الخاص بالمتصفح -->
+            <video id="video-player" controls autoplay></video>
         </div>
         <div class="sidebar">
             <div class="search-box">
@@ -76,13 +55,11 @@
            { name: "ALKASS 1", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8" },
            { name: "ALKASS 2", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8" },
            { name: "ALKASS 3", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass3-p/main.m3u8" },
-           { name: "ALKASS 4", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass4-p/main.m3u8" },
-           { name: "ALKASS 5", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass5-p/main.m3u8" },
-           { name: "ALKASS 6", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass6-p/main.m3u8" },
-           { name: "ALKASS 7", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass7-p/main.m3u8" }
+           { name: "ALKASS 4", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass4-p/main.m3u8" }
         ];
 
-        var playerInstance = null;
+        var hls = null;
+        var video = document.getElementById('video-player');
 
         function renderChannels(filterText) {
             if (!filterText) filterText = "";
@@ -96,7 +73,7 @@
                     if (channel.cat !== currentCat && filterText === "") {
                         var catHeader = document.createElement("div");
                         catHeader.className = "category-header";
-                        catHeader.innerText = channel.cat || "قنوات عامة";
+                        catHeader.innerText = channel.cat;
                         listContainer.appendChild(catHeader);
                         currentCat = channel.cat;
                     }
@@ -105,12 +82,7 @@
                     btn.className = "channel-btn";
                     btn.id = "btn-" + i;
                     
-                    var typeBadge = "LIVE";
-                    if (channel.url.indexOf(".m3u8") !== -1 || channel.url.indexOf(".ts") !== -1) typeBadge = "HLS";
-                    if (channel.url.indexOf(".mpd") !== -1) typeBadge = "DASH";
-
-                    btn.innerHTML = '<span>' + channel.name + '</span>' +
-                                    '<span style="font-size: 10px; color: #aaa; background: #333; padding: 2px 6px; border-radius: 4px;">' + typeBadge + '</span>';
+                    btn.innerHTML = '<span>' + channel.name + '</span><span style="font-size: 10px; color: #aaa; background: #333; padding: 2px 6px; border-radius: 4px;">HLS</span>';
                     
                     (function(index) {
                         btn.onclick = function() { playChannel(index); };
@@ -127,31 +99,33 @@
             var activeBtn = document.getElementById("btn-" + index);
             if(activeBtn) activeBtn.classList.add("active");
 
-            // إيقاف وتدمير المشغل القديم إذا كان يعمل
-            if (playerInstance) {
-                playerInstance.destroy();
-            }
+            // تدمير البث القديم إن وُجد
+            if (hls) { hls.destroy(); }
 
-            // تشغيل القناة باستخدام Clappr
-            playerInstance = new Clappr.Player({
-                source: channel.url,
-                parentId: "#player",
-                width: '100%',
-                height: '100%',
-                autoPlay: true,
-                mute: false,
-                playback: {
-                    hlsjsConfig: {
-                        // إعدادات لتسريع البث
-                        liveSyncDurationCount: 3,
+            if (Hls.isSupported()) {
+                // الفكرة كلها هنا: إضافة البروكسي قبل كل طلب سحب للفيديو
+                hls = new Hls({
+                    xhrSetup: function(xhr, url) {
+                        // استخدام خدمة Proxy مجانية لتخطي الـ CORS
+                        var proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+                        xhr.open('GET', proxyUrl, true);
                     }
-                }
-            });
-        }
+                });
 
-        function filterChannels() {
-            var text = document.getElementById("searchInput").value;
-            renderChannels(text);
+                hls.loadSource(channel.url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    video.play().catch(function(e) { console.log("التشغيل التلقائي يحتاج لتفاعل المستخدم أولاً."); });
+                });
+            } 
+            // دعم متصفح سفاري (أجهزة أبل) لأنها تشغل البث بدون HLS.js
+            else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                // في سفاري غالباً الـ CORS ليس مشكلة كبيرة للبث المباشر
+                video.src = channel.url;
+                video.addEventListener('loadedmetadata', function() {
+                    video.play();
+                });
+            }
         }
 
         renderChannels("");
