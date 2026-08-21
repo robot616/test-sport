@@ -8,8 +8,8 @@
     <link rel="icon" type="image/png" sizes="512x512" href="https://img.icons8.com/fluency/512/play.png">
     <meta name="apple-mobile-web-app-title" content="Sports Hub">
 
-    <!-- مكتبة JW Player -->
-    <script src="https://content.jwplatform.com/libraries/SAHhwvZq.js"></script>
+    <!-- مكتبة Clappr كبديل قوي ومجاني لتشغيل قنوات IPTV / M3U8 -->
+    <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
 
     <style>
         html, body {
@@ -55,17 +55,6 @@
             .player-wrapper { height: 40vh; flex: none; }
             .sidebar { width: 100%; height: 60vh; border-left: none; border-top: 1px solid #333; }
         }
-
-        /* أيقونة التكبير 55% */
-        .jw-icon-fullscreen svg { display: none !important; }
-        .jw-icon-fullscreen {
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNOCAzSDVhMiAyIDAgMCAwLTIgMnYzbTE4IDBWNWEyIDIgMCAwIDAtMi0yaC0zbTAgMThoM2EyIDIgMCAwIDAgMi0ydi0zTTMgMTZ2M2EyIDIgMCAwIDAgMiAyaDMiLz48L3N2Zz4=');
-            background-size: 55%; 
-            background-position: center; background-repeat: no-repeat;
-        }
-        .jw-flag-fullscreen .jw-icon-fullscreen {
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNOCAzdjNhMiAyIDAgMCAxLTIgMkgzbTE4IDBoLTNhMiAyIDAgMCAxLTItMlYzbTAgMThoM2EyIDIgMCAwIDEgMiAydjMiLz48L3N2Zz4=');
-        }
     </style>
 </head>
 <body>
@@ -84,13 +73,13 @@
 
     <script>
         var channels = [ 
-   { name: "ALKASS 1", url: "https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8" },
-   { name: "ALKASS 2", url: "https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8" },
-   { name: "ALKASS 3", url: "https://liveeu-gcp.alkassdigital.net/alkass3-p/main.m3u8" },
-   { name: "ALKASS 4", url: "https://liveeu-gcp.alkassdigital.net/alkass4-p/main.m3u8" },
-   { name: "ALKASS 5", url: "https://liveeu-gcp.alkassdigital.net/alkass5-p/main.m3u8" },
-   { name: "ALKASS 6", url: "https://liveeu-gcp.alkassdigital.net/alkass6-p/main.m3u8" },
-   { name: "ALKASS 7", url: "https://liveeu-gcp.alkassdigital.net/alkass7-p/main.m3u8" },
+           { name: "ALKASS 1", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8" },
+           { name: "ALKASS 2", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8" },
+           { name: "ALKASS 3", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass3-p/main.m3u8" },
+           { name: "ALKASS 4", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass4-p/main.m3u8" },
+           { name: "ALKASS 5", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass5-p/main.m3u8" },
+           { name: "ALKASS 6", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass6-p/main.m3u8" },
+           { name: "ALKASS 7", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass7-p/main.m3u8" }
         ];
 
         var playerInstance = null;
@@ -107,7 +96,7 @@
                     if (channel.cat !== currentCat && filterText === "") {
                         var catHeader = document.createElement("div");
                         catHeader.className = "category-header";
-                        catHeader.innerText = channel.cat;
+                        catHeader.innerText = channel.cat || "قنوات عامة";
                         listContainer.appendChild(catHeader);
                         currentCat = channel.cat;
                     }
@@ -132,49 +121,31 @@
         }
 
         function playChannel(index) {
-            if (typeof jwplayer === 'undefined') {
-                document.getElementById('player').innerHTML = '<h3 style="color:#ff4d4d; text-align:center; margin-top:20%; font-family:tahoma;">تم حظر مشغل الفيديو!<br>يرجى إيقاف مانع الإعلانات (AdBlock).</h3>';
-                return;
-            }
-
             var channel = channels[index];
             var allBtns = document.querySelectorAll(".channel-btn");
             for (var j = 0; j < allBtns.length; j++) { allBtns[j].classList.remove("active"); }
             var activeBtn = document.getElementById("btn-" + index);
             if(activeBtn) activeBtn.classList.add("active");
 
-            var setupConfig = {
-                file: channel.url,
-                type: channel.url.indexOf(".m3u8") !== -1 || channel.url.indexOf(".ts") !== -1 ? "hls" : "dash",
-                width: "100%", height: "100%",
-                autostart: true, preload: "auto", stretching: "uniform"
-            };
-
-            // إعدادات التشفير السليمة
-            if (channel.k1 && channel.k2) {
-                setupConfig.drm = { clearkey: { keyId: channel.k1, key: channel.k2 } };
+            // إيقاف وتدمير المشغل القديم إذا كان يعمل
+            if (playerInstance) {
+                playerInstance.destroy();
             }
 
-            playerInstance = jwplayer("player").setup(setupConfig);
-
-            playerInstance.on('ready', function() {
-                var isStretched = false;
-                var diagonalCutArrow = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTQgMTBsNy03bS02IDBoNnY2bS0xMSA1bC03IDdtNiAwSDN2LTYiLz48L3N2Zz4=";
-
-                playerInstance.addButton(
-                    diagonalCutArrow, 
-                    "توسيع/تضييق الصورة", 
-                    function() {
-                        if (!isStretched) {
-                            playerInstance.setConfig({ stretching: "exactfit" }); 
-                            isStretched = true;
-                        } else {
-                            playerInstance.setConfig({ stretching: "uniform" });
-                            isStretched = false;
-                        }
-                    },
-                    "stretch-button"
-                );
+            // تشغيل القناة باستخدام Clappr
+            playerInstance = new Clappr.Player({
+                source: channel.url,
+                parentId: "#player",
+                width: '100%',
+                height: '100%',
+                autoPlay: true,
+                mute: false,
+                playback: {
+                    hlsjsConfig: {
+                        // إعدادات لتسريع البث
+                        liveSyncDurationCount: 3,
+                    }
+                }
             });
         }
 
