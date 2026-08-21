@@ -3,35 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live TV - Proxy HLS</title>
+    <title>Live TV - Extracted Channels</title>
     
     <link rel="icon" type="image/png" sizes="512x512" href="https://img.icons8.com/fluency/512/play.png">
-    
-    <!-- مكتبة HLS.js الأساسية لتشغيل البث -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <meta name="apple-mobile-web-app-title" content="Sports Hub">
+
+    <!-- مكتبة JW Player -->
+    <script src="https://content.jwplatform.com/libraries/SAHhwvZq.js"></script>
 
     <style>
-        html, body { margin: 0; padding: 0; width: 100vw; height: 100vh; background: #0f0f0f; color: #fff; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; }
+        html, body {
+            margin: 0; padding: 0;
+            width: 100vw; height: 100vh;
+            background: #0f0f0f; color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
         .app-container { display: flex; width: 100vw; height: 100vh; flex-direction: row; }
-        .sidebar { width: 320px; background: #181818; border-left: 1px solid #333; display: flex; flex-direction: column; z-index: 10; }
+        .sidebar {
+            width: 320px; background: #181818;
+            border-left: 1px solid #333; display: flex; flex-direction: column; z-index: 10;
+        }
         .search-box { padding: 15px; background: #222; border-bottom: 1px solid #333; }
-        .search-box input { width: 100%; padding: 12px; background: #111; border: 1px solid #444; color: #fff; border-radius: 6px; font-size: 14px; box-sizing: border-box; outline: none; }
+        .search-box input {
+            width: 100%; padding: 12px; background: #111; border: 1px solid #444;
+            color: #fff; border-radius: 6px; font-size: 14px; box-sizing: border-box; outline: none;
+        }
         .search-box input:focus { border-color: #1dcf60; }
         .channel-list { flex: 1; overflow-y: auto; padding: 10px; }
         .channel-list::-webkit-scrollbar { width: 6px; }
         .channel-list::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
-        .category-header { color: #1dcf60; font-size: 15px; font-weight: bold; padding: 10px; border-right: 3px solid #1dcf60; background: #112b1a; border-radius: 4px; margin-bottom: 5px; margin-top: 15px; }
-        .channel-btn { background: #222; padding: 12px 15px; margin-bottom: 5px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: all 0.2s ease; display: flex; align-items: center; justify-content: space-between; }
+        
+        .category-header {
+            color: #1dcf60; font-size: 15px; font-weight: bold;
+            padding: 10px; border-right: 3px solid #1dcf60;
+            background: #112b1a; border-radius: 4px; margin-bottom: 5px; margin-top: 15px;
+        }
+
+        .channel-btn {
+            background: #222; padding: 12px 15px; margin-bottom: 5px; border-radius: 6px;
+            cursor: pointer; font-weight: bold; font-size: 13px; transition: all 0.2s ease;
+            display: flex; align-items: center; justify-content: space-between;
+        }
         .channel-btn:hover { background: #333; }
         .channel-btn.active { background: #1dcf60; color: #fff; }
-        .player-wrapper { flex: 1; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
-        
-        #video-player { width: 100%; height: 100%; background: #000; outline: none; }
+        .player-wrapper { flex: 1; position: relative; background: #000; }
+        #player { position: absolute !important; top: 0; right: 0; bottom: 0; left: 0; width: 100% !important; height: 100% !important; }
         
         @media (max-width: 768px) {
             .app-container { flex-direction: column; }
             .player-wrapper { height: 40vh; flex: none; }
             .sidebar { width: 100%; height: 60vh; border-left: none; border-top: 1px solid #333; }
+        }
+
+        /* أيقونة التكبير 55% */
+        .jw-icon-fullscreen svg { display: none !important; }
+        .jw-icon-fullscreen {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNOCAzSDVhMiAyIDAgMCAwLTIgMnYzbTE4IDBWNWEyIDIgMCAwIDAtMi0yaC0zbTAgMThoM2EyIDIgMCAwIDAgMi0ydi0zTTMgMTZ2M2EyIDIgMCAwIDAgMiAyaDMiLz48L3N2Zz4=');
+            background-size: 55%; 
+            background-position: center; background-repeat: no-repeat;
+        }
+        .jw-flag-fullscreen .jw-icon-fullscreen {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNOCAzdjNhMiAyIDAgMCAxLTIgMkgzbTE4IDBoLTNhMiAyIDAgMCAxLTItMlYzbTAgMThoM2EyIDIgMCAwIDEgMiAydjMiLz48L3N2Zz4=');
         }
     </style>
 </head>
@@ -39,8 +72,7 @@
 
     <div class="app-container">
         <div class="player-wrapper">
-            <!-- مشغل الفيديو الافتراضي الخاص بالمتصفح -->
-            <video id="video-player" controls autoplay></video>
+            <div id="player"></div>
         </div>
         <div class="sidebar">
             <div class="search-box">
@@ -52,14 +84,16 @@
 
     <script>
         var channels = [ 
-           { name: "ALKASS 1", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8" },
-           { name: "ALKASS 2", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8" },
-           { name: "ALKASS 3", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass3-p/main.m3u8" },
-           { name: "ALKASS 4", cat: "قنوات الكأس", url: "https://liveeu-gcp.alkassdigital.net/alkass4-p/main.m3u8" }
+   { name: "ALKASS 1", url: "https://liveeu-gcp.alkassdigital.net/alkass1-p/main.m3u8" },
+   { name: "ALKASS 2", url: "https://liveeu-gcp.alkassdigital.net/alkass2-p/main.m3u8" },
+   { name: "ALKASS 3", url: "https://liveeu-gcp.alkassdigital.net/alkass3-p/main.m3u8" },
+   { name: "ALKASS 4", url: "https://liveeu-gcp.alkassdigital.net/alkass4-p/main.m3u8" },
+   { name: "ALKASS 5", url: "https://liveeu-gcp.alkassdigital.net/alkass5-p/main.m3u8" },
+   { name: "ALKASS 6", url: "https://liveeu-gcp.alkassdigital.net/alkass6-p/main.m3u8" },
+   { name: "ALKASS 7", url: "https://liveeu-gcp.alkassdigital.net/alkass7-p/main.m3u8" },
         ];
 
-        var hls = null;
-        var video = document.getElementById('video-player');
+        var playerInstance = null;
 
         function renderChannels(filterText) {
             if (!filterText) filterText = "";
@@ -82,7 +116,12 @@
                     btn.className = "channel-btn";
                     btn.id = "btn-" + i;
                     
-                    btn.innerHTML = '<span>' + channel.name + '</span><span style="font-size: 10px; color: #aaa; background: #333; padding: 2px 6px; border-radius: 4px;">HLS</span>';
+                    var typeBadge = "LIVE";
+                    if (channel.url.indexOf(".m3u8") !== -1 || channel.url.indexOf(".ts") !== -1) typeBadge = "HLS";
+                    if (channel.url.indexOf(".mpd") !== -1) typeBadge = "DASH";
+
+                    btn.innerHTML = '<span>' + channel.name + '</span>' +
+                                    '<span style="font-size: 10px; color: #aaa; background: #333; padding: 2px 6px; border-radius: 4px;">' + typeBadge + '</span>';
                     
                     (function(index) {
                         btn.onclick = function() { playChannel(index); };
@@ -93,39 +132,55 @@
         }
 
         function playChannel(index) {
+            if (typeof jwplayer === 'undefined') {
+                document.getElementById('player').innerHTML = '<h3 style="color:#ff4d4d; text-align:center; margin-top:20%; font-family:tahoma;">تم حظر مشغل الفيديو!<br>يرجى إيقاف مانع الإعلانات (AdBlock).</h3>';
+                return;
+            }
+
             var channel = channels[index];
             var allBtns = document.querySelectorAll(".channel-btn");
             for (var j = 0; j < allBtns.length; j++) { allBtns[j].classList.remove("active"); }
             var activeBtn = document.getElementById("btn-" + index);
             if(activeBtn) activeBtn.classList.add("active");
 
-            // تدمير البث القديم إن وُجد
-            if (hls) { hls.destroy(); }
+            var setupConfig = {
+                file: channel.url,
+                type: channel.url.indexOf(".m3u8") !== -1 || channel.url.indexOf(".ts") !== -1 ? "hls" : "dash",
+                width: "100%", height: "100%",
+                autostart: true, preload: "auto", stretching: "uniform"
+            };
 
-            if (Hls.isSupported()) {
-                // الفكرة كلها هنا: إضافة البروكسي قبل كل طلب سحب للفيديو
-                hls = new Hls({
-                    xhrSetup: function(xhr, url) {
-                        // استخدام خدمة Proxy مجانية لتخطي الـ CORS
-                        var proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
-                        xhr.open('GET', proxyUrl, true);
-                    }
-                });
-
-                hls.loadSource(channel.url);
-                hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    video.play().catch(function(e) { console.log("التشغيل التلقائي يحتاج لتفاعل المستخدم أولاً."); });
-                });
-            } 
-            // دعم متصفح سفاري (أجهزة أبل) لأنها تشغل البث بدون HLS.js
-            else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                // في سفاري غالباً الـ CORS ليس مشكلة كبيرة للبث المباشر
-                video.src = channel.url;
-                video.addEventListener('loadedmetadata', function() {
-                    video.play();
-                });
+            // إعدادات التشفير السليمة
+            if (channel.k1 && channel.k2) {
+                setupConfig.drm = { clearkey: { keyId: channel.k1, key: channel.k2 } };
             }
+
+            playerInstance = jwplayer("player").setup(setupConfig);
+
+            playerInstance.on('ready', function() {
+                var isStretched = false;
+                var diagonalCutArrow = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTQgMTBsNy03bS02IDBoNnY2bS0xMSA1bC03IDdtNiAwSDN2LTYiLz48L3N2Zz4=";
+
+                playerInstance.addButton(
+                    diagonalCutArrow, 
+                    "توسيع/تضييق الصورة", 
+                    function() {
+                        if (!isStretched) {
+                            playerInstance.setConfig({ stretching: "exactfit" }); 
+                            isStretched = true;
+                        } else {
+                            playerInstance.setConfig({ stretching: "uniform" });
+                            isStretched = false;
+                        }
+                    },
+                    "stretch-button"
+                );
+            });
+        }
+
+        function filterChannels() {
+            var text = document.getElementById("searchInput").value;
+            renderChannels(text);
         }
 
         renderChannels("");
