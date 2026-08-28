@@ -1,445 +1,459 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Player</title>
+    <title>Live TV - Extracted Channels</title>
     
+    <link rel="icon" type="image/png" sizes="512x512" href="https://img.icons8.com/fluency/512/play.png">
+    <meta name="apple-mobile-web-app-title" content="Sports Hub">
+
     <!-- مكتبة JW Player -->
     <script src="https://content.jwplatform.com/libraries/SAHhwvZq.js"></script>
-    
+
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        html, body {
+            margin: 0; padding: 0;
+            width: 100vw; height: 100vh;
+            background: #0f0f0f; color: #fff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            display: flex;
-            height: 100vh;
-            background-color: #000;
-            color: #fff;
             overflow: hidden;
-            /* توجيه من اليسار لليمين لضمان بقاء القائمة على اليسار كما في الصورة */
-            direction: ltr; 
         }
-
-        /* ------------------------------------- */
-        /* تصميم القائمة الجانبية (Sidebar) */
-        /* ------------------------------------- */
+        .app-container { display: flex; width: 100vw; height: 100vh; flex-direction: row; }
         .sidebar {
-            width: 320px;
-            background-color: #121212;
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid #222;
-            z-index: 10;
+            width: 320px; background: #181818;
+            border-left: 1px solid #333; display: flex; flex-direction: column; z-index: 10;
         }
-
-        .search-container {
-            padding: 15px;
-            background-color: #181818;
-            border-bottom: 1px solid #222;
+        .search-box { padding: 15px; background: #222; border-bottom: 1px solid #333; }
+        .search-box input {
+            width: 100%; padding: 12px; background: #111; border: 1px solid #444;
+            color: #fff; border-radius: 6px; font-size: 14px; box-sizing: border-box; outline: none;
         }
-
-        .search-box {
-            width: 100%;
-            background-color: #000;
-            border: 1px solid #333;
-            color: #fff;
-            padding: 12px 15px;
-            border-radius: 6px;
-            outline: none;
-            font-size: 13px;
-            direction: rtl; /* الكتابة بالعربي داخل صندوق البحث */
-        }
-
-        .search-box:focus {
-            border-color: #1ed760;
-        }
-
-        .channel-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        /* تخصيص شريط التمرير (Scrollbar) */
+        .search-box input:focus { border-color: #1dcf60; }
+        .channel-list { flex: 1; overflow-y: auto; padding: 10px; }
         .channel-list::-webkit-scrollbar { width: 6px; }
-        .channel-list::-webkit-scrollbar-track { background: #121212; }
-        .channel-list::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        .channel-list::-webkit-scrollbar-thumb:hover { background: #555; }
-
-        .channel-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #1e1e1e;
-            padding: 12px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s ease;
+        .channel-list::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+        
+        .category-header {
+            color: #1dcf60; font-size: 15px; font-weight: bold;
+            padding: 10px; border-right: 3px solid #1dcf60;
+            background: #112b1a; border-radius: 4px; margin-bottom: 5px; margin-top: 15px;
         }
 
-        .channel-item:hover {
-            background-color: #2a2a2a;
+        .channel-btn {
+            background: #222; padding: 12px 15px; margin-bottom: 5px; border-radius: 6px;
+            cursor: pointer; font-weight: bold; font-size: 13px; transition: all 0.2s ease;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .channel-btn:hover { background: #333; }
+        .channel-btn.active { background: #1dcf60; color: #fff; }
+        .player-wrapper { flex: 1; position: relative; background: #000; }
+        #player { position: absolute !important; top: 0; right: 0; bottom: 0; left: 0; width: 100% !important; height: 100% !important; }
+        
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column; }
+            .player-wrapper { height: 40vh; flex: none; }
+            .sidebar { width: 100%; height: 60vh; border-left: none; border-top: 1px solid #333; }
         }
 
-        .channel-item.active {
-            background-color: #2ecc71; /* اللون الأخضر المطابق للصورة */
-            color: #000;
-        }
-
-        .channel-badge {
-            background-color: #333;
-            color: #aaa;
-            font-size: 10px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-
-        .channel-item.active .channel-badge {
-            background-color: rgba(0, 0, 0, 0.2);
-            color: #000;
-        }
-
-        .channel-name {
-            font-size: 14px;
-            font-weight: bold;
-            direction: rtl;
-        }
-
-        /* ------------------------------------- */
-        /* منطقة المشغل */
-        /* ------------------------------------- */
-        .player-container {
-            flex: 1;
-            position: relative;
-            background-color: #000;
-        }
-
-        #player {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-        }
-
-        /* تعديلات أيقونات JW Player */
+        /* أيقونة التكبير 55% */
         .jw-icon-fullscreen svg { display: none !important; }
         .jw-icon-fullscreen {
             background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNOCAzSDVhMiAyIDAgMCAwLTIgMnYzbTE4IDBWNWEyIDIgMCAwIDAtMi0yaC0zbTAgMThoM2EyIDIgMCAwIDAgMi0ydi0zTTMgMTZ2M2EyIDIgMCAwIDAgMiAyaDMiLz48L3N2Zz4=');
-            background-size: 55%; background-position: center; background-repeat: no-repeat;
+            background-size: 55%; 
+            background-position: center; background-repeat: no-repeat;
         }
         .jw-flag-fullscreen .jw-icon-fullscreen {
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNOCAzdjNhMiAyIDAgMCAxLTIgMkgzbTE4IDBoLTNhMiAyIDAgMCAxLTUtMlYzbTAgMTh2LTNhMiAyIDAgMCAxIDItMmgzTTMgMTZoM2EyIDIgMCAwIDEgMiAydjMiLz48L3N2Zz4=');
-        }
-        .jw-icon-playlist, .jw-icon-next, .jw-related-btn { display: none !important; }
-
-        @media (max-width: 768px) {
-            body { flex-direction: column-reverse; }
-            .sidebar { width: 100%; height: 40%; border-right: none; border-top: 1px solid #222; }
-            .player-container { height: 60%; flex: none; }
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNOCAzdjNhMiAyIDAgMCAxLTIgMkgzbTE4IDBoLTNhMiAyIDAgMCAxLTItMlYzbTAgMThoM2EyIDIgMCAwIDEgMiAydjMiLz48L3N2Zz4=');
         }
     </style>
 </head>
 <body>
 
-    <!-- القائمة الجانبية -->
-    <div class="sidebar">
-        <div class="search-container">
-            <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن قناة هنا..." onkeyup="handleSearch()">
+    <div class="app-container">
+        <div class="player-wrapper">
+            <div id="player"></div>
         </div>
-        <div class="channel-list" id="channelList"></div>
-    </div>
-
-    <!-- حاوية المشغل -->
-    <div class="player-container">
-        <div id="player"></div>
+        <div class="sidebar">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="ابحث عن قناة هنا..." onkeyup="filterChannels()">
+            </div>
+            <div class="channel-list" id="channelList"></div>
+        </div>
     </div>
 
     <script>
-        // جميع القنوات المسحوبة من الكود الأساسي الخاص بك
-        const channelsData = [
-            { title: "beIN SPORTS 1", file: "https://auto-m3u-mate.lovable.app/hls/1424.m3u8", type: "hls" },
-            { title: "beIN SPORTS 2", file: "https://auto-m3u-mate.lovable.app/hls/1425.m3u8", type: "hls" },
-            { title: "beIN SPORTS 3", file: "https://auto-m3u-mate.lovable.app/hls/1426.m3u8", type: "hls" },
-            { title: "beIN SPORTS 4", file: "https://auto-m3u-mate.lovable.app/hls/1427.m3u8", type: "hls" },
-            { title: "beIN SPORTS 5", file: "https://auto-m3u-mate.lovable.app/hls/1428.m3u8", type: "hls" },
-            { title: "beIN SPORTS 6", file: "https://auto-m3u-mate.lovable.app/hls/1429.m3u8", type: "hls" },
-            { title: "beIN SPORTS 7", file: "https://auto-m3u-mate.lovable.app/hls/1430.m3u8", type: "hls" },
-            { title: "beIN SPORTS 8", file: "https://auto-m3u-mate.lovable.app/hls/1431.m3u8", type: "hls" },
-            { title: "beIN SPORTS 9", file: "https://auto-m3u-mate.lovable.app/hls/1432.m3u8", type: "hls" },
-            { title: "beIN France 1", file: "https://auto-m3u-mate.lovable.app/hls/1433.m3u8", type: "hls" },
-            { title: "beIN France 2", file: "https://auto-m3u-mate.lovable.app/hls/1434.m3u8", type: "hls" },
-            { title: "beIN France 3", file: "https://auto-m3u-mate.lovable.app/hls/1435.m3u8", type: "hls" },
-            { title: "beIN English 1", file: "https://auto-m3u-mate.lovable.app/hls/1481.m3u8", type: "hls" },
-            { title: "beIN English 2", file: "https://auto-m3u-mate.lovable.app/hls/1482.m3u8", type: "hls" },
-            { title: "beIN English 3", file: "https://auto-m3u-mate.lovable.app/hls/1483.m3u8", type: "hls" },
-            { title: "beIN SPORTS (FTA)", file: "https://auto-m3u-mate.lovable.app/hls/1437.m3u8", type: "hls" },
-            { title: "beIN Boomerang", file: "https://auto-m3u-mate.lovable.app/hls/60.m3u8", type: "hls" },
-            { title: "beIN Jeem", file: "https://auto-m3u-mate.lovable.app/hls/61.m3u8", type: "hls" },
-            { title: "beIN Baraem", file: "https://auto-m3u-mate.lovable.app/hls/62.m3u8", type: "hls" },
-            { title: "beIN Fatafeat", file: "https://auto-m3u-mate.lovable.app/hls/63.m3u8", type: "hls" },
-            { title: "beIN Drama", file: "https://auto-m3u-mate.lovable.app/hls/64.m3u8", type: "hls" },
-            { title: "beIN Gourmet", file: "https://auto-m3u-mate.lovable.app/hls/65.m3u8", type: "hls" },
-            { title: "beIN Series 1", file: "https://auto-m3u-mate.lovable.app/hls/66.m3u8", type: "hls" },
-            { title: "beIN Series 2", file: "https://auto-m3u-mate.lovable.app/hls/67.m3u8", type: "hls" },
-            { title: "beIN Movies 1", file: "https://auto-m3u-mate.lovable.app/hls/68.m3u8", type: "hls" },
-            { title: "beIN Movies 2", file: "https://auto-m3u-mate.lovable.app/hls/69.m3u8", type: "hls" },
-            { title: "beIN Movies 3", file: "https://auto-m3u-mate.lovable.app/hls/70.m3u8", type: "hls" },
-            { title: "beIN Movies 4", file: "https://auto-m3u-mate.lovable.app/hls/71.m3u8", type: "hls" },
-            { title: "beIN BOX OFFICE", file: "https://auto-m3u-mate.lovable.app/hls/1420.m3u8", type: "hls" },
-            { title: "MBC 1", file: "https://auto-m3u-mate.lovable.app/hls/135.m3u8", type: "hls" },
-            { title: "MBC 2", file: "https://auto-m3u-mate.lovable.app/hls/136.m3u8", type: "hls" },
-            { title: "MBC 3", file: "https://auto-m3u-mate.lovable.app/hls/137.m3u8", type: "hls" },
-            { title: "MBC 4", file: "https://auto-m3u-mate.lovable.app/hls/138.m3u8", type: "hls" },
-            { title: "MBC 5", file: "https://auto-m3u-mate.lovable.app/hls/139.m3u8", type: "hls" },
-            { title: "MBC IRAQ", file: "https://auto-m3u-mate.lovable.app/hls/130.m3u8", type: "hls" },
-            { title: "MBC Maser", file: "https://auto-m3u-mate.lovable.app/hls/131.m3u8", type: "hls" },
-            { title: "MBC Masr 2", file: "https://auto-m3u-mate.lovable.app/hls/132.m3u8", type: "hls" },
-            { title: "MBC Drama", file: "https://auto-m3u-mate.lovable.app/hls/133.m3u8", type: "hls" },
-            { title: "MBC Drama +", file: "https://auto-m3u-mate.lovable.app/hls/134.m3u8", type: "hls" },
-            { title: "MBC Maser Drama", file: "https://auto-m3u-mate.lovable.app/hls/143.m3u8", type: "hls" },
-            { title: "MBC Action", file: "https://auto-m3u-mate.lovable.app/hls/140.m3u8", type: "hls" },
-            { title: "MBC Max", file: "https://auto-m3u-mate.lovable.app/hls/141.m3u8", type: "hls" },
-            { title: "MBC Bollywood", file: "https://auto-m3u-mate.lovable.app/hls/142.m3u8", type: "hls" },
-            { title: "MBC FM", file: "https://auto-m3u-mate.lovable.app/hls/144.m3u8", type: "hls" },
-            { title: "Panorama FM", file: "https://auto-m3u-mate.lovable.app/hls/145.m3u8", type: "hls" },
-            { title: "Wanasah", file: "https://auto-m3u-mate.lovable.app/hls/146.m3u8", type: "hls" },
-            { title: "France 2", file: "https://auto-m3u-mate.lovable.app/hls/220.m3u8", type: "hls" },
-            { title: "France 3", file: "https://auto-m3u-mate.lovable.app/hls/221.m3u8", type: "hls" },
-            { title: "France 4", file: "https://auto-m3u-mate.lovable.app/hls/222.m3u8", type: "hls" },
-            { title: "France 5", file: "https://auto-m3u-mate.lovable.app/hls/223.m3u8", type: "hls" },
-            { title: "France Info", file: "https://auto-m3u-mate.lovable.app/hls/225.m3u8", type: "hls" },
-            { title: "L'Equipe 21", file: "https://auto-m3u-mate.lovable.app/hls/232.m3u8", type: "hls" },
-            { title: "RMC Sport 1", file: "https://auto-m3u-mate.lovable.app/hls/226.m3u8", type: "hls" },
-            { title: "RMC Sport 2", file: "https://auto-m3u-mate.lovable.app/hls/227.m3u8", type: "hls" },
-            { title: "RMC Decouv", file: "https://auto-m3u-mate.lovable.app/hls/231.m3u8", type: "hls" },
-            { title: "Eurosport 1", file: "https://auto-m3u-mate.lovable.app/hls/233.m3u8", type: "hls" },
-            { title: "Eurosport 2", file: "https://auto-m3u-mate.lovable.app/hls/234.m3u8", type: "hls" },
-            { title: "TV5MONDE Maghreb", file: "https://auto-m3u-mate.lovable.app/hls/1873.m3u8", type: "hls" },
-            { title: "TV5MONDE Europe", file: "https://auto-m3u-mate.lovable.app/hls/1874.m3u8", type: "hls" },
-            { title: "Euronews", file: "https://auto-m3u-mate.lovable.app/hls/241.m3u8", type: "hls" },
-            { title: "RT France", file: "https://auto-m3u-mate.lovable.app/hls/242.m3u8", type: "hls" },
-            { title: "France 24", file: "https://auto-m3u-mate.lovable.app/hls/243.m3u8", type: "hls" },
-            { title: "TV5Monde Info", file: "https://auto-m3u-mate.lovable.app/hls/244.m3u8", type: "hls" },
-            { title: "C8", file: "https://auto-m3u-mate.lovable.app/hls/1040.m3u8", type: "hls" },
-            { title: "CNEWS", file: "https://auto-m3u-mate.lovable.app/hls/1041.m3u8", type: "hls" },
-            { title: "CSTAR", file: "https://auto-m3u-mate.lovable.app/hls/1042.m3u8", type: "hls" },
-            { title: "Public Sénat", file: "https://auto-m3u-mate.lovable.app/hls/1043.m3u8", type: "hls" },
-            { title: "Tivi5MONDE", file: "https://auto-m3u-mate.lovable.app/hls/1852.m3u8", type: "hls" },
-            { title: "TV5MONDE Style", file: "https://auto-m3u-mate.lovable.app/hls/1853.m3u8", type: "hls" },
-            { title: "TF1 Series", file: "https://auto-m3u-mate.lovable.app/hls/235.m3u8", type: "hls" },
-            { title: "TF1", file: "https://auto-m3u-mate.lovable.app/hls/236.m3u8", type: "hls" },
-            { title: "LCI", file: "https://auto-m3u-mate.lovable.app/hls/237.m3u8", type: "hls" },
-            { title: "TFX TV", file: "https://auto-m3u-mate.lovable.app/hls/238.m3u8", type: "hls" },
-            { title: "TMC TV", file: "https://auto-m3u-mate.lovable.app/hls/239.m3u8", type: "hls" },
-            { title: "Arte", file: "https://auto-m3u-mate.lovable.app/hls/495.m3u8", type: "hls" },
-            { title: "BFM Toulon", file: "https://auto-m3u-mate.lovable.app/hls/1866.m3u8", type: "hls" },
-            { title: "BFM Normandie", file: "https://auto-m3u-mate.lovable.app/hls/1868.m3u8", type: "hls" },
-            { title: "BFM Nice", file: "https://auto-m3u-mate.lovable.app/hls/1869.m3u8", type: "hls" },
-            { title: "BFM Marseille", file: "https://auto-m3u-mate.lovable.app/hls/1870.m3u8", type: "hls" },
-            { title: "BFM H.Provence", file: "https://auto-m3u-mate.lovable.app/hls/1871.m3u8", type: "hls" },
-            { title: "BFM Alpes", file: "https://auto-m3u-mate.lovable.app/hls/1872.m3u8", type: "hls" },
-            { title: "BFM TV", file: "https://auto-m3u-mate.lovable.app/hls/1670.m3u8", type: "hls" },
-            { title: "BFM Alsace", file: "https://auto-m3u-mate.lovable.app/hls/1671.m3u8", type: "hls" },
-            { title: "BFM Lyon", file: "https://auto-m3u-mate.lovable.app/hls/1672.m3u8", type: "hls" },
-            { title: "BFM Business", file: "https://auto-m3u-mate.lovable.app/hls/1673.m3u8", type: "hls" },
-            { title: "BFM Lille", file: "https://auto-m3u-mate.lovable.app/hls/245.m3u8", type: "hls" },
-            { title: "BFM Littoral", file: "https://auto-m3u-mate.lovable.app/hls/246.m3u8", type: "hls" },
-            { title: "BFM Paris", file: "https://auto-m3u-mate.lovable.app/hls/247.m3u8", type: "hls" },
-            { title: "TECH&CO", file: "https://auto-m3u-mate.lovable.app/hls/1855.m3u8", type: "hls" },
-            { title: "ACTION HD", file: "https://auto-m3u-mate.lovable.app/hls/257.m3u8", type: "hls" },
-            { title: "Paris Premier", file: "https://auto-m3u-mate.lovable.app/hls/248.m3u8", type: "hls" },
-            { title: "NRJ12", file: "https://auto-m3u-mate.lovable.app/hls/249.m3u8", type: "hls" },
-            { title: "NRJ Hits", file: "https://auto-m3u-mate.lovable.app/hls/250.m3u8", type: "hls" },
-            { title: "M6", file: "https://auto-m3u-mate.lovable.app/hls/251.m3u8", type: "hls" },
-            { title: "6ter", file: "https://auto-m3u-mate.lovable.app/hls/252.m3u8", type: "hls" },
-            { title: "W9", file: "https://auto-m3u-mate.lovable.app/hls/253.m3u8", type: "hls" },
-            { title: "13 Eme Rue", file: "https://auto-m3u-mate.lovable.app/hls/254.m3u8", type: "hls" },
-            { title: "CINE Emotion", file: "https://auto-m3u-mate.lovable.app/hls/256.m3u8", type: "hls" },
-            { title: "CINE PREMIER", file: "https://auto-m3u-mate.lovable.app/hls/255.m3u8", type: "hls" },
-            { title: "CANAL PLUS", file: "https://auto-m3u-mate.lovable.app/hls/258.m3u8", type: "hls" },
-            { title: "CANAL+ SPORT", file: "https://auto-m3u-mate.lovable.app/hls/259.m3u8", type: "hls" },
-            { title: "CANAL+ CINEMA", file: "https://auto-m3u-mate.lovable.app/hls/260.m3u8", type: "hls" },
-            { title: "CANAL+ DECALE", file: "https://auto-m3u-mate.lovable.app/hls/261.m3u8", type: "hls" },
-            { title: "CANAL+ FAMILY", file: "https://auto-m3u-mate.lovable.app/hls/262.m3u8", type: "hls" },
-            { title: "CANAL+ SERIES", file: "https://auto-m3u-mate.lovable.app/hls/263.m3u8", type: "hls" },
-            { title: "CANALPLAY 1", file: "https://auto-m3u-mate.lovable.app/hls/265.m3u8", type: "hls" },
-            { title: "CANALPLAY 2", file: "https://auto-m3u-mate.lovable.app/hls/266.m3u8", type: "hls" },
-            { title: "CANALPLAY 3", file: "https://auto-m3u-mate.lovable.app/hls/267.m3u8", type: "hls" },
-            { title: "CANALPLAY 4", file: "https://auto-m3u-mate.lovable.app/hls/268.m3u8", type: "hls" },
-            { title: "CANALPLAY 5", file: "https://auto-m3u-mate.lovable.app/hls/269.m3u8", type: "hls" },
-            { title: "Planete + CI", file: "https://auto-m3u-mate.lovable.app/hls/286.m3u8", type: "hls" },
-            { title: "Animaux TV", file: "https://auto-m3u-mate.lovable.app/hls/287.m3u8", type: "hls" },
-            { title: "Nat Geo Wild", file: "https://auto-m3u-mate.lovable.app/hls/288.m3u8", type: "hls" },
-            { title: "Le Figaro IDF", file: "https://auto-m3u-mate.lovable.app/hls/411.m3u8", type: "hls" },
-            { title: "Monde du Loisir", file: "https://auto-m3u-mate.lovable.app/hls/439.m3u8", type: "hls" },
-            { title: "Le Figaro Live", file: "https://auto-m3u-mate.lovable.app/hls/443.m3u8", type: "hls" },
-            { title: "CANAL J", file: "https://auto-m3u-mate.lovable.app/hls/444.m3u8", type: "hls" },
-            { title: "Gulli", file: "https://auto-m3u-mate.lovable.app/hls/450.m3u8", type: "hls" },
-            { title: "Disney XD", file: "https://auto-m3u-mate.lovable.app/hls/451.m3u8", type: "hls" },
-            { title: "Boomerang FR", file: "https://auto-m3u-mate.lovable.app/hls/452.m3u8", type: "hls" },
-            { title: "Disney JR", file: "https://auto-m3u-mate.lovable.app/hls/453.m3u8", type: "hls" },
-            { title: "Cartoon Network", file: "https://auto-m3u-mate.lovable.app/hls/454.m3u8", type: "hls" },
-            { title: "Nickelodeon FR", file: "https://auto-m3u-mate.lovable.app/hls/455.m3u8", type: "hls" },
-            { title: "Nick JR", file: "https://auto-m3u-mate.lovable.app/hls/456.m3u8", type: "hls" },
-            { title: "MANGAS", file: "https://auto-m3u-mate.lovable.app/hls/457.m3u8", type: "hls" },
-            { title: "Boing TV", file: "https://auto-m3u-mate.lovable.app/hls/458.m3u8", type: "hls" },
-            { title: "Nord-Africaine", file: "https://auto-m3u-mate.lovable.app/hls/461.m3u8", type: "hls" },
-            { title: "TMA Caraibes", file: "https://auto-m3u-mate.lovable.app/hls/466.m3u8", type: "hls" },
-            { title: "Contact fell", file: "https://auto-m3u-mate.lovable.app/hls/467.m3u8", type: "hls" },
-            { title: "ViàVosges", file: "https://auto-m3u-mate.lovable.app/hls/473.m3u8", type: "hls" },
-            { title: "ViàMATÉLÉ", file: "https://auto-m3u-mate.lovable.app/hls/474.m3u8", type: "hls" },
-            { title: "ViàMoselle TV", file: "https://auto-m3u-mate.lovable.app/hls/475.m3u8", type: "hls" },
-            { title: "TV3V", file: "https://auto-m3u-mate.lovable.app/hls/477.m3u8", type: "hls" },
-            { title: "TV7 Colmar", file: "https://auto-m3u-mate.lovable.app/hls/478.m3u8", type: "hls" },
-            { title: "TV78", file: "https://auto-m3u-mate.lovable.app/hls/479.m3u8", type: "hls" },
-            { title: "TVR Bretagne", file: "https://auto-m3u-mate.lovable.app/hls/480.m3u8", type: "hls" },
-            { title: "TebeSud", file: "https://auto-m3u-mate.lovable.app/hls/481.m3u8", type: "hls" },
-            { title: "Tebeo", file: "https://auto-m3u-mate.lovable.app/hls/482.m3u8", type: "hls" },
-            { title: "Luxe TV", file: "https://auto-m3u-mate.lovable.app/hls/483.m3u8", type: "hls" },
-            { title: "Fashion TV", file: "https://auto-m3u-mate.lovable.app/hls/484.m3u8", type: "hls" },
-            { title: "Fuel TV", file: "https://auto-m3u-mate.lovable.app/hls/485.m3u8", type: "hls" },
-            { title: "Francophonie", file: "https://auto-m3u-mate.lovable.app/hls/490.m3u8", type: "hls" },
-            { title: "Bip TV", file: "https://auto-m3u-mate.lovable.app/hls/492.m3u8", type: "hls" },
-            { title: "LN 24", file: "https://auto-m3u-mate.lovable.app/hls/493.m3u8", type: "hls" },
-            { title: "RTL9", file: "https://auto-m3u-mate.lovable.app/hls/494.m3u8", type: "hls" },
-            { title: "africanews", file: "https://auto-m3u-mate.lovable.app/hls/1039.m3u8", type: "hls" },
-            { title: "IDF1", file: "https://auto-m3u-mate.lovable.app/hls/1814.m3u8", type: "hls" },
-            { title: "M6 International", file: "https://auto-m3u-mate.lovable.app/hls/1850.m3u8", type: "hls" },
-            { title: "Chérie 25", file: "https://auto-m3u-mate.lovable.app/hls/1851.m3u8", type: "hls" },
-            { title: "GONG", file: "https://auto-m3u-mate.lovable.app/hls/1854.m3u8", type: "hls" },
-            { title: "Tele Novela TV", file: "https://auto-m3u-mate.lovable.app/hls/1856.m3u8", type: "hls" },
-            { title: "Wild Side TV", file: "https://auto-m3u-mate.lovable.app/hls/1857.m3u8", type: "hls" },
-            { title: "KTO", file: "https://auto-m3u-mate.lovable.app/hls/1858.m3u8", type: "hls" },
-            { title: "Museum TV", file: "https://auto-m3u-mate.lovable.app/hls/1859.m3u8", type: "hls" },
-            { title: "FUN Radio", file: "https://auto-m3u-mate.lovable.app/hls/1860.m3u8", type: "hls" },
-            { title: "Generations TV", file: "https://auto-m3u-mate.lovable.app/hls/1861.m3u8", type: "hls" },
-            { title: "Melody TV", file: "https://auto-m3u-mate.lovable.app/hls/1862.m3u8", type: "hls" },
-            { title: "Trace Urban", file: "https://auto-m3u-mate.lovable.app/hls/1863.m3u8", type: "hls" },
-            { title: "Trace Sport", file: "https://auto-m3u-mate.lovable.app/hls/1864.m3u8", type: "hls" },
-            { title: "Sport en France", file: "https://auto-m3u-mate.lovable.app/hls/1865.m3u8", type: "hls" },
-            { title: "TRT Diyanet Çocuk", file: "https://auto-m3u-mate.lovable.app/hls/1876.m3u8", type: "hls" },
-            { title: "Cartoon Network Turk", file: "https://auto-m3u-mate.lovable.app/hls/1878.m3u8", type: "hls" },
-            { title: "Haber Global", file: "https://auto-m3u-mate.lovable.app/hls/1879.m3u8", type: "hls" },
-            { title: "TV100", file: "https://auto-m3u-mate.lovable.app/hls/1880.m3u8", type: "hls" },
-            { title: "CNN Türk", file: "https://auto-m3u-mate.lovable.app/hls/1881.m3u8", type: "hls" },
-            { title: "NTV", file: "https://auto-m3u-mate.lovable.app/hls/1882.m3u8", type: "hls" },
-            { title: "EKO TÜRK", file: "https://auto-m3u-mate.lovable.app/hls/1883.m3u8", type: "hls" },
-            { title: "TBMM TV", file: "https://auto-m3u-mate.lovable.app/hls/1884.m3u8", type: "hls" },
-            { title: "DHA", file: "https://auto-m3u-mate.lovable.app/hls/1885.m3u8", type: "hls" },
-            { title: "Anadolu Agency", file: "https://auto-m3u-mate.lovable.app/hls/1886.m3u8", type: "hls" },
-            { title: "Flash Haber", file: "https://auto-m3u-mate.lovable.app/hls/1887.m3u8", type: "hls" },
-            { title: "Sözcü TV", file: "https://auto-m3u-mate.lovable.app/hls/1888.m3u8", type: "hls" },
-            { title: "KRT TV", file: "https://auto-m3u-mate.lovable.app/hls/1889.m3u8", type: "hls" },
-            { title: "Tele1", file: "https://auto-m3u-mate.lovable.app/hls/1890.m3u8", type: "hls" },
-            { title: "Halk TV", file: "https://auto-m3u-mate.lovable.app/hls/1891.m3u8", type: "hls" },
-            { title: "Ulusal Kanal", file: "https://auto-m3u-mate.lovable.app/hls/1892.m3u8", type: "hls" },
-            { title: "Bbn Türk", file: "https://auto-m3u-mate.lovable.app/hls/1893.m3u8", type: "hls" },
-            { title: "Bengü Türk", file: "https://auto-m3u-mate.lovable.app/hls/1894.m3u8", type: "hls" },
-            { title: "TGRT Haber", file: "https://auto-m3u-mate.lovable.app/hls/1895.m3u8", type: "hls" },
-            { title: "A Haber", file: "https://auto-m3u-mate.lovable.app/hls/1896.m3u8", type: "hls" },
-            { title: "TV NET", file: "https://auto-m3u-mate.lovable.app/hls/1897.m3u8", type: "hls" },
-            { title: "TV 24", file: "https://auto-m3u-mate.lovable.app/hls/1898.m3u8", type: "hls" },
-            { title: "ÜLKE TV", file: "https://auto-m3u-mate.lovable.app/hls/1899.m3u8", type: "hls" },
-            { title: "Akit TV", file: "https://auto-m3u-mate.lovable.app/hls/1900.m3u8", type: "hls" },
-            { title: "Yol TV", file: "https://auto-m3u-mate.lovable.app/hls/1901.m3u8", type: "hls" },
-            { title: "A Spor", file: "https://auto-m3u-mate.lovable.app/hls/1674.m3u8", type: "hls" },
-            { title: "TRT 1", file: "https://auto-m3u-mate.lovable.app/hls/1449.m3u8", type: "hls" },
-            { title: "TRT 2", file: "https://auto-m3u-mate.lovable.app/hls/1450.m3u8", type: "hls" },
-            { title: "TRT Arabic", file: "https://auto-m3u-mate.lovable.app/hls/1451.m3u8", type: "hls" },
-            { title: "TRT Avaz", file: "https://auto-m3u-mate.lovable.app/hls/1452.m3u8", type: "hls" },
-            { title: "TRT Belgesel", file: "https://auto-m3u-mate.lovable.app/hls/1453.m3u8", type: "hls" },
-            { title: "TRT Cocuk", file: "https://auto-m3u-mate.lovable.app/hls/1454.m3u8", type: "hls" },
-            { title: "TRT EBA Ilkokul", file: "https://auto-m3u-mate.lovable.app/hls/1455.m3u8", type: "hls" },
-            { title: "TRT EBA Lise", file: "https://auto-m3u-mate.lovable.app/hls/1456.m3u8", type: "hls" },
-            { title: "TRT EBA Ortaokul", file: "https://auto-m3u-mate.lovable.app/hls/1457.m3u8", type: "hls" },
-            { title: "TRT Haber", file: "https://auto-m3u-mate.lovable.app/hls/1458.m3u8", type: "hls" },
-            { title: "TRT Kurdi", file: "https://auto-m3u-mate.lovable.app/hls/1459.m3u8", type: "hls" },
-            { title: "TRT Muzik", file: "https://auto-m3u-mate.lovable.app/hls/1460.m3u8", type: "hls" },
-            { title: "TRT Turk", file: "https://auto-m3u-mate.lovable.app/hls/1461.m3u8", type: "hls" },
-            { title: "TRT World", file: "https://auto-m3u-mate.lovable.app/hls/1462.m3u8", type: "hls" },
-            { title: "CN Arabic", file: "https://auto-m3u-mate.lovable.app/hls/166.m3u8", type: "hls" },
-            { title: "Gulli Arabic", file: "https://auto-m3u-mate.lovable.app/hls/170.m3u8", type: "hls" },
-            { title: "Boomerang AR", file: "https://auto-m3u-mate.lovable.app/hls/171.m3u8", type: "hls" },
-            { title: "Spacetoon", file: "https://auto-m3u-mate.lovable.app/hls/173.m3u8", type: "hls" },
-            { title: "beIN Jeem", file: "https://auto-m3u-mate.lovable.app/hls/987.m3u8", type: "hls" },
-            { title: "beIN Baraem", file: "https://auto-m3u-mate.lovable.app/hls/988.m3u8", type: "hls" }
+        var channels = [ 
+            // ------------------ beIN SPORTS ------------------
+            { 
+                name: "beIN SPORTS 1", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1424.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/4.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/24.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/44.m3u8", label: "244P"}]
+            },
+            { 
+                name: "beIN SPORTS 2", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1425.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/5.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/25.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/45.m3u8", label: "244P"}]
+            },
+            { 
+                name: "beIN SPORTS 3", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1426.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/6.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/26.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/46.m3u8", label: "244P"}]
+            },
+            { 
+                name: "beIN SPORTS 4", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1427.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/7.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/27.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/47.m3u8", label: "244P"}]
+            },
+            { 
+                name: "beIN SPORTS 5", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1428.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/8.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/28.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/48.m3u8", label: "244P"}]
+            },
+            { 
+                name: "beIN SPORTS 6", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1429.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/9.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/29.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/49.m3u8", label: "244P"}]
+            },
+            { 
+                name: "beIN SPORTS 7", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1430.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/10.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/30.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/50.m3u8", label: "244P"}]
+            },
+            { 
+                name: "beIN SPORTS 8", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1431.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/11.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/31.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/51.m3u8", label: "244P"}]
+            },
+            { 
+                name: "beIN SPORTS 9", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1432.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/12.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/32.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/52.m3u8", label: "244P"}]
+            },
+            { 
+                name: "beIN France 1", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1433.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/13.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/33.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/53.m3u8", label: "244P"}]
+            },
+            { 
+                name: "beIN France 2", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1434.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/14.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/34.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/54.m3u8", label: "244P"}]
+            },
+            { 
+                name: "beIN France 3", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1435.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/15.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/35.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/55.m3u8", label: "244P"}]
+            },
+            { 
+                name: "beIN English 1", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1481.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/18.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/38.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/58.m3u8", label: "244P"}]
+            },
+            { 
+                name: "beIN English 2", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1482.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/19.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/39.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/59.m3u8", label: "244P"}]
+            },
+            { 
+                name: "beIN English 3", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1483.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/20.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/40.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/80.m3u8", label: "244P"}]
+            },
+            { 
+                name: "beIN SPORTS (FTA)", cat: "beIN SPORTS", 
+                sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1437.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/17.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/37.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/57.m3u8", label: "244P"}]
+            },
+
+            // ------------------ beIN ENTERTAINMENT ------------------
+            { name: "beIN Boomerang", url: "https://auto-m3u-mate.lovable.app/hls/60.m3u8", cat: "beIN ENTERTAINMENT" },
+            { name: "beIN Jeem", url: "https://auto-m3u-mate.lovable.app/hls/61.m3u8", cat: "beIN ENTERTAINMENT" },
+            { name: "beIN Baraem", url: "https://auto-m3u-mate.lovable.app/hls/62.m3u8", cat: "beIN ENTERTAINMENT" },
+            { name: "beIN Fatafeat", url: "https://auto-m3u-mate.lovable.app/hls/63.m3u8", cat: "beIN ENTERTAINMENT" },
+            { name: "beIN Drama", url: "https://auto-m3u-mate.lovable.app/hls/64.m3u8", cat: "beIN ENTERTAINMENT" },
+            { name: "beIN Gourmet", url: "https://auto-m3u-mate.lovable.app/hls/65.m3u8", cat: "beIN ENTERTAINMENT" },
+            { name: "beIN Series 1", url: "https://auto-m3u-mate.lovable.app/hls/66.m3u8", cat: "beIN ENTERTAINMENT" },
+            { name: "beIN Series 2", url: "https://auto-m3u-mate.lovable.app/hls/67.m3u8", cat: "beIN ENTERTAINMENT" },
+            { name: "beIN Movies 1", url: "https://auto-m3u-mate.lovable.app/hls/68.m3u8", cat: "beIN ENTERTAINMENT" },
+            { name: "beIN Movies 2", url: "https://auto-m3u-mate.lovable.app/hls/69.m3u8", cat: "beIN ENTERTAINMENT" },
+            { name: "beIN Movies 3", url: "https://auto-m3u-mate.lovable.app/hls/70.m3u8", cat: "beIN ENTERTAINMENT" },
+            { name: "beIN Movies 4", url: "https://auto-m3u-mate.lovable.app/hls/71.m3u8", cat: "beIN ENTERTAINMENT" },
+            { name: "beIN BOX OFFICE", url: "https://auto-m3u-mate.lovable.app/hls/1420.m3u8", cat: "beIN ENTERTAINMENT" },
+
+            // ------------------ MBC CHANNELS ------------------
+            { name: "MBC 1", url: "https://auto-m3u-mate.lovable.app/hls/135.m3u8", cat: "MBC CHANNELS" },
+            { name: "MBC 2", url: "https://auto-m3u-mate.lovable.app/hls/136.m3u8", cat: "MBC CHANNELS" },
+            { name: "MBC 3", url: "https://auto-m3u-mate.lovable.app/hls/137.m3u8", cat: "MBC CHANNELS" },
+            { name: "MBC 4", url: "https://auto-m3u-mate.lovable.app/hls/138.m3u8", cat: "MBC CHANNELS" },
+            { name: "MBC 5", url: "https://auto-m3u-mate.lovable.app/hls/139.m3u8", cat: "MBC CHANNELS" },
+            { name: "MBC IRAQ", url: "https://auto-m3u-mate.lovable.app/hls/130.m3u8", cat: "MBC CHANNELS" },
+            { name: "MBC Maser", url: "https://auto-m3u-mate.lovable.app/hls/131.m3u8", cat: "MBC CHANNELS" },
+            { name: "MBC Masr 2", url: "https://auto-m3u-mate.lovable.app/hls/132.m3u8", cat: "MBC CHANNELS" },
+            { name: "MBC Drama", url: "https://auto-m3u-mate.lovable.app/hls/133.m3u8", cat: "MBC CHANNELS" },
+            { name: "MBC Drama +", url: "https://auto-m3u-mate.lovable.app/hls/134.m3u8", cat: "MBC CHANNELS" },
+            { name: "MBC Maser Drama", url: "https://auto-m3u-mate.lovable.app/hls/143.m3u8", cat: "MBC CHANNELS" },
+            { name: "MBC Action", url: "https://auto-m3u-mate.lovable.app/hls/140.m3u8", cat: "MBC CHANNELS" },
+            { name: "MBC Max", url: "https://auto-m3u-mate.lovable.app/hls/141.m3u8", cat: "MBC CHANNELS" },
+            { name: "MBC Bollywood", url: "https://auto-m3u-mate.lovable.app/hls/142.m3u8", cat: "MBC CHANNELS" },
+            { name: "MBC FM", url: "https://auto-m3u-mate.lovable.app/hls/144.m3u8", cat: "MBC CHANNELS" },
+            { name: "Panorama FM", url: "https://auto-m3u-mate.lovable.app/hls/145.m3u8", cat: "MBC CHANNELS" },
+            { name: "Wanasah", url: "https://auto-m3u-mate.lovable.app/hls/146.m3u8", cat: "MBC CHANNELS" },
+
+            // ------------------ FRANCE CHANNELS ------------------
+            { name: "France 2", url: "https://auto-m3u-mate.lovable.app/hls/220.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "France 3", url: "https://auto-m3u-mate.lovable.app/hls/221.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "France 4", url: "https://auto-m3u-mate.lovable.app/hls/222.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "France 5", url: "https://auto-m3u-mate.lovable.app/hls/223.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "France Info", url: "https://auto-m3u-mate.lovable.app/hls/225.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "L'Equipe 21", url: "https://auto-m3u-mate.lovable.app/hls/232.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "RMC Sport 1", url: "https://auto-m3u-mate.lovable.app/hls/226.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "RMC Sport 2", url: "https://auto-m3u-mate.lovable.app/hls/227.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "RMC Decouv", url: "https://auto-m3u-mate.lovable.app/hls/231.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Eurosport 1", url: "https://auto-m3u-mate.lovable.app/hls/233.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Eurosport 2", url: "https://auto-m3u-mate.lovable.app/hls/234.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "TV5MONDE Maghreb", url: "https://auto-m3u-mate.lovable.app/hls/1873.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "TV5MONDE Europe", url: "https://auto-m3u-mate.lovable.app/hls/1874.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Euronews", url: "https://auto-m3u-mate.lovable.app/hls/241.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "RT France", url: "https://auto-m3u-mate.lovable.app/hls/242.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "France 24", url: "https://auto-m3u-mate.lovable.app/hls/243.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "TV5Monde Info", url: "https://auto-m3u-mate.lovable.app/hls/244.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "C8", url: "https://auto-m3u-mate.lovable.app/hls/1040.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CNEWS", url: "https://auto-m3u-mate.lovable.app/hls/1041.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CSTAR", url: "https://auto-m3u-mate.lovable.app/hls/1042.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Public Sénat", url: "https://auto-m3u-mate.lovable.app/hls/1043.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Tivi5MONDE", url: "https://auto-m3u-mate.lovable.app/hls/1852.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "TV5MONDE Style", url: "https://auto-m3u-mate.lovable.app/hls/1853.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "TF1 Series", url: "https://auto-m3u-mate.lovable.app/hls/235.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "TF1", url: "https://auto-m3u-mate.lovable.app/hls/236.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "LCI", url: "https://auto-m3u-mate.lovable.app/hls/237.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "TFX TV", url: "https://auto-m3u-mate.lovable.app/hls/238.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "TMC TV", url: "https://auto-m3u-mate.lovable.app/hls/239.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Arte", url: "https://auto-m3u-mate.lovable.app/hls/495.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "BFM Toulon", url: "https://auto-m3u-mate.lovable.app/hls/1866.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "BFM Normandie", url: "https://auto-m3u-mate.lovable.app/hls/1868.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "BFM Nice", url: "https://auto-m3u-mate.lovable.app/hls/1869.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "BFM Marseille", url: "https://auto-m3u-mate.lovable.app/hls/1870.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "BFM H.Provence", url: "https://auto-m3u-mate.lovable.app/hls/1871.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "BFM Alpes", url: "https://auto-m3u-mate.lovable.app/hls/1872.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "BFM TV", url: "https://auto-m3u-mate.lovable.app/hls/1670.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "BFM Alsace", url: "https://auto-m3u-mate.lovable.app/hls/1671.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "BFM Lyon", url: "https://auto-m3u-mate.lovable.app/hls/1672.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "BFM Business", url: "https://auto-m3u-mate.lovable.app/hls/1673.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "BFM Lille", url: "https://auto-m3u-mate.lovable.app/hls/245.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "BFM Littoral", url: "https://auto-m3u-mate.lovable.app/hls/246.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "BFM Paris", url: "https://auto-m3u-mate.lovable.app/hls/247.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "TECH&CO", url: "https://auto-m3u-mate.lovable.app/hls/1855.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "ACTION HD", url: "https://auto-m3u-mate.lovable.app/hls/257.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Paris Premier", url: "https://auto-m3u-mate.lovable.app/hls/248.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "NRJ12", url: "https://auto-m3u-mate.lovable.app/hls/249.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "NRJ Hits", url: "https://auto-m3u-mate.lovable.app/hls/250.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "M6", url: "https://auto-m3u-mate.lovable.app/hls/251.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "6ter", url: "https://auto-m3u-mate.lovable.app/hls/252.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "W9", url: "https://auto-m3u-mate.lovable.app/hls/253.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "13 Eme Rue", url: "https://auto-m3u-mate.lovable.app/hls/254.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CINE Emotion", url: "https://auto-m3u-mate.lovable.app/hls/256.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CINE PREMIER", url: "https://auto-m3u-mate.lovable.app/hls/255.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CANAL PLUS", url: "https://auto-m3u-mate.lovable.app/hls/258.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CANAL+ SPORT", url: "https://auto-m3u-mate.lovable.app/hls/259.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CANAL+ CINEMA", url: "https://auto-m3u-mate.lovable.app/hls/260.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CANAL+ DECALE", url: "https://auto-m3u-mate.lovable.app/hls/261.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CANAL+ FAMILY", url: "https://auto-m3u-mate.lovable.app/hls/262.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CANAL+ SERIES", url: "https://auto-m3u-mate.lovable.app/hls/263.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CANALPLAY 1", url: "https://auto-m3u-mate.lovable.app/hls/265.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CANALPLAY 2", url: "https://auto-m3u-mate.lovable.app/hls/266.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CANALPLAY 3", url: "https://auto-m3u-mate.lovable.app/hls/267.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CANALPLAY 4", url: "https://auto-m3u-mate.lovable.app/hls/268.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CANALPLAY 5", url: "https://auto-m3u-mate.lovable.app/hls/269.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Planete + CI", url: "https://auto-m3u-mate.lovable.app/hls/286.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Animaux TV", url: "https://auto-m3u-mate.lovable.app/hls/287.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Nat Geo Wild", url: "https://auto-m3u-mate.lovable.app/hls/288.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Le Figaro IDF", url: "https://auto-m3u-mate.lovable.app/hls/411.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Monde du Loisir", url: "https://auto-m3u-mate.lovable.app/hls/439.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Le Figaro Live", url: "https://auto-m3u-mate.lovable.app/hls/443.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "CANAL J", url: "https://auto-m3u-mate.lovable.app/hls/444.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Gulli", url: "https://auto-m3u-mate.lovable.app/hls/450.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Disney XD", url: "https://auto-m3u-mate.lovable.app/hls/451.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Boomerang FR", url: "https://auto-m3u-mate.lovable.app/hls/452.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Disney JR", url: "https://auto-m3u-mate.lovable.app/hls/453.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Cartoon Network", url: "https://auto-m3u-mate.lovable.app/hls/454.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Nickelodeon FR", url: "https://auto-m3u-mate.lovable.app/hls/455.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Nick JR", url: "https://auto-m3u-mate.lovable.app/hls/456.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "MANGAS", url: "https://auto-m3u-mate.lovable.app/hls/457.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Boing TV", url: "https://auto-m3u-mate.lovable.app/hls/458.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Nord-Africaine", url: "https://auto-m3u-mate.lovable.app/hls/461.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "TMA Caraibes", url: "https://auto-m3u-mate.lovable.app/hls/466.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Contact fell", url: "https://auto-m3u-mate.lovable.app/hls/467.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "ViàVosges", url: "https://auto-m3u-mate.lovable.app/hls/473.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "ViàMATÉLÉ", url: "https://auto-m3u-mate.lovable.app/hls/474.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "ViàMoselle TV", url: "https://auto-m3u-mate.lovable.app/hls/475.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "TV3V", url: "https://auto-m3u-mate.lovable.app/hls/477.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "TV7 Colmar", url: "https://auto-m3u-mate.lovable.app/hls/478.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "TV78", url: "https://auto-m3u-mate.lovable.app/hls/479.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "TVR Bretagne", url: "https://auto-m3u-mate.lovable.app/hls/480.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "TebeSud", url: "https://auto-m3u-mate.lovable.app/hls/481.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Tebeo", url: "https://auto-m3u-mate.lovable.app/hls/482.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Luxe TV", url: "https://auto-m3u-mate.lovable.app/hls/483.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Fashion TV", url: "https://auto-m3u-mate.lovable.app/hls/484.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Fuel TV", url: "https://auto-m3u-mate.lovable.app/hls/485.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Francophonie", url: "https://auto-m3u-mate.lovable.app/hls/490.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Bip TV", url: "https://auto-m3u-mate.lovable.app/hls/492.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "LN 24", url: "https://auto-m3u-mate.lovable.app/hls/493.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "RTL9", url: "https://auto-m3u-mate.lovable.app/hls/494.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "africanews", url: "https://auto-m3u-mate.lovable.app/hls/1039.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "IDF1", url: "https://auto-m3u-mate.lovable.app/hls/1814.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "M6 International", url: "https://auto-m3u-mate.lovable.app/hls/1850.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Chérie 25", url: "https://auto-m3u-mate.lovable.app/hls/1851.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "GONG", url: "https://auto-m3u-mate.lovable.app/hls/1854.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Tele Novela TV", url: "https://auto-m3u-mate.lovable.app/hls/1856.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Wild Side TV", url: "https://auto-m3u-mate.lovable.app/hls/1857.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "KTO", url: "https://auto-m3u-mate.lovable.app/hls/1858.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Museum TV", url: "https://auto-m3u-mate.lovable.app/hls/1859.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "FUN Radio", url: "https://auto-m3u-mate.lovable.app/hls/1860.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Generations TV", url: "https://auto-m3u-mate.lovable.app/hls/1861.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Melody TV", url: "https://auto-m3u-mate.lovable.app/hls/1862.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Trace Urban", url: "https://auto-m3u-mate.lovable.app/hls/1863.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Trace Sport", url: "https://auto-m3u-mate.lovable.app/hls/1864.m3u8", cat: "FRANCE CHANNELS" },
+            { name: "Sport en France", url: "https://auto-m3u-mate.lovable.app/hls/1865.m3u8", cat: "FRANCE CHANNELS" },
+
+            // ------------------ TURKISH CHANNELS ------------------
+            { name: "TRT Diyanet Çocuk", url: "https://auto-m3u-mate.lovable.app/hls/1876.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "Cartoon Network Turk", url: "https://auto-m3u-mate.lovable.app/hls/1878.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "Haber Global", url: "https://auto-m3u-mate.lovable.app/hls/1879.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TV100", url: "https://auto-m3u-mate.lovable.app/hls/1880.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "CNN Türk", url: "https://auto-m3u-mate.lovable.app/hls/1881.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "NTV", url: "https://auto-m3u-mate.lovable.app/hls/1882.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "EKO TÜRK", url: "https://auto-m3u-mate.lovable.app/hls/1883.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TBMM TV", url: "https://auto-m3u-mate.lovable.app/hls/1884.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "DHA", url: "https://auto-m3u-mate.lovable.app/hls/1885.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "Anadolu Agency", url: "https://auto-m3u-mate.lovable.app/hls/1886.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "Flash Haber", url: "https://auto-m3u-mate.lovable.app/hls/1887.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "Sözcü TV", url: "https://auto-m3u-mate.lovable.app/hls/1888.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "KRT TV", url: "https://auto-m3u-mate.lovable.app/hls/1889.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "Tele1", url: "https://auto-m3u-mate.lovable.app/hls/1890.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "Halk TV", url: "https://auto-m3u-mate.lovable.app/hls/1891.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "Ulusal Kanal", url: "https://auto-m3u-mate.lovable.app/hls/1892.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "Bbn Türk", url: "https://auto-m3u-mate.lovable.app/hls/1893.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "Bengü Türk", url: "https://auto-m3u-mate.lovable.app/hls/1894.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TGRT Haber", url: "https://auto-m3u-mate.lovable.app/hls/1895.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "A Haber", url: "https://auto-m3u-mate.lovable.app/hls/1896.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TV NET", url: "https://auto-m3u-mate.lovable.app/hls/1897.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TV 24", url: "https://auto-m3u-mate.lovable.app/hls/1898.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "ÜLKE TV", url: "https://auto-m3u-mate.lovable.app/hls/1899.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "Akit TV", url: "https://auto-m3u-mate.lovable.app/hls/1900.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "Yol TV", url: "https://auto-m3u-mate.lovable.app/hls/1901.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "A Spor", url: "https://auto-m3u-mate.lovable.app/hls/1674.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TRT 1", url: "https://auto-m3u-mate.lovable.app/hls/1449.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TRT 2", url: "https://auto-m3u-mate.lovable.app/hls/1450.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TRT Arabic", url: "https://auto-m3u-mate.lovable.app/hls/1451.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TRT Avaz", url: "https://auto-m3u-mate.lovable.app/hls/1452.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TRT Belgesel", url: "https://auto-m3u-mate.lovable.app/hls/1453.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TRT Cocuk", url: "https://auto-m3u-mate.lovable.app/hls/1454.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TRT EBA Ilkokul", url: "https://auto-m3u-mate.lovable.app/hls/1455.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TRT EBA Lise", url: "https://auto-m3u-mate.lovable.app/hls/1456.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TRT EBA Ortaokul", url: "https://auto-m3u-mate.lovable.app/hls/1457.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TRT Haber", url: "https://auto-m3u-mate.lovable.app/hls/1458.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TRT Kurdi", url: "https://auto-m3u-mate.lovable.app/hls/1459.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TRT Muzik", url: "https://auto-m3u-mate.lovable.app/hls/1460.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TRT Turk", url: "https://auto-m3u-mate.lovable.app/hls/1461.m3u8", cat: "TURKISH CHANNELS" },
+            { name: "TRT World", url: "https://auto-m3u-mate.lovable.app/hls/1462.m3u8", cat: "TURKISH CHANNELS" },
+
+            // ------------------ KIDS CHANNELS ------------------
+            { name: "CN Arabic", url: "https://auto-m3u-mate.lovable.app/hls/166.m3u8", cat: "KIDS CHANNELS" },
+            { name: "Gulli Arabic", url: "https://auto-m3u-mate.lovable.app/hls/170.m3u8", cat: "KIDS CHANNELS" },
+            { name: "Boomerang AR", url: "https://auto-m3u-mate.lovable.app/hls/171.m3u8", cat: "KIDS CHANNELS" },
+            { name: "Spacetoon", url: "https://auto-m3u-mate.lovable.app/hls/173.m3u8", cat: "KIDS CHANNELS" },
+            { name: "beIN Jeem", url: "https://auto-m3u-mate.lovable.app/hls/987.m3u8", cat: "KIDS CHANNELS" },
+            { name: "beIN Baraem", url: "https://auto-m3u-mate.lovable.app/hls/988.m3u8", cat: "KIDS CHANNELS" }
         ];
 
-        let playerInstance;
+        var playerInstance = null;
 
-        function renderList(channels) {
-            const list = document.getElementById('channelList');
-            list.innerHTML = '';
-            
-            channels.forEach((ch, index) => {
-                const item = document.createElement('div');
-                // تحديد العنصر الأول ليكون المفعل افتراضياً
-                item.className = 'channel-item' + (index === 0 && channels.length === channelsData.length ? ' active' : '');
-                
-                // هيكل العنصر يطابق الصورة: الـ Badge على اليسار والاسم على اليمين
-                item.innerHTML = `
-                    <span class="channel-badge">${ch.type.toUpperCase()}</span>
-                    <span class="channel-name">${ch.title}</span>
-                `;
-                
-                item.onclick = function() {
-                    // إزالة التفعيل عن باقي العناصر
-                    document.querySelectorAll('.channel-item').forEach(el => el.classList.remove('active'));
-                    item.classList.add('active');
+        function renderChannels(filterText) {
+            if (!filterText) filterText = "";
+            var listContainer = document.getElementById("channelList");
+            listContainer.innerHTML = "";
+            var currentCat = "";
+
+            for (var i = 0; i < channels.length; i++) {
+                var channel = channels[i];
+                if (channel.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1) {
+                    if (channel.cat !== currentCat && filterText === "") {
+                        var catHeader = document.createElement("div");
+                        catHeader.className = "category-header";
+                        catHeader.innerText = channel.cat;
+                        listContainer.appendChild(catHeader);
+                        currentCat = channel.cat;
+                    }
+
+                    var btn = document.createElement("div");
+                    btn.className = "channel-btn";
+                    btn.id = "btn-" + i;
                     
-                    // تشغيل القناة
-                    const originalIndex = channelsData.indexOf(ch);
-                    playerInstance.playlistItem(originalIndex);
-                };
-                
-                list.appendChild(item);
+                    var typeBadge = "LIVE";
+                    // تحديد نوع القناة بشكل آمن (ولو فيها مصادر متعددة بنأخذ المصدر الأول كمعيار)
+                    var checkUrl = channel.url || (channel.sources && channel.sources[0].file) || "";
+                    
+                    if (checkUrl.indexOf(".m3u8") !== -1 || checkUrl.indexOf(".ts") !== -1) typeBadge = "HLS";
+                    if (checkUrl.indexOf(".mpd") !== -1) typeBadge = "DASH";
+
+                    btn.innerHTML = '<span>' + channel.name + '</span>' +
+                                    '<span style="font-size: 10px; color: #aaa; background: #333; padding: 2px 6px; border-radius: 4px;">' + typeBadge + '</span>';
+                    
+                    (function(index) {
+                        btn.onclick = function() { playChannel(index); };
+                    })(i);
+                    listContainer.appendChild(btn);
+                }
+            }
+        }
+
+        function playChannel(index) {
+            if (typeof jwplayer === 'undefined') {
+                document.getElementById('player').innerHTML = '<h3 style="color:#ff4d4d; text-align:center; margin-top:20%; font-family:tahoma;">تم حظر مشغل الفيديو!<br>يرجى إيقاف مانع الإعلانات (AdBlock).</h3>';
+                return;
+            }
+
+            var channel = channels[index];
+            var allBtns = document.querySelectorAll(".channel-btn");
+            for (var j = 0; j < allBtns.length; j++) { allBtns[j].classList.remove("active"); }
+            var activeBtn = document.getElementById("btn-" + index);
+            if(activeBtn) activeBtn.classList.add("active");
+
+            var setupConfig = {
+                type: "hls", 
+                width: "100%", height: "100%",
+                autostart: true, preload: "auto", stretching: "uniform"
+            };
+
+            // دعم الجودات المتعددة داخل ترس JW Player أو الرابط المباشر
+            if (channel.sources) {
+                setupConfig.sources = channel.sources;
+            } else {
+                setupConfig.file = channel.url;
+                setupConfig.type = channel.url.indexOf(".m3u8") !== -1 || channel.url.indexOf(".ts") !== -1 ? "hls" : "dash";
+            }
+
+            // إعدادات التشفير السليمة
+            if (channel.k1 && channel.k2) {
+                setupConfig.drm = { clearkey: { keyId: channel.k1, key: channel.k2 } };
+            }
+
+            playerInstance = jwplayer("player").setup(setupConfig);
+
+            playerInstance.on('ready', function() {
+                var isStretched = false;
+                var diagonalCutArrow = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTQgMTBsNy03bS02IDBoNnY2bS0xMSA1bC03IDdtNiAwSDN2LTYiLz48L3N2Zz4=";
+
+                playerInstance.addButton(
+                    diagonalCutArrow, 
+                    "توسيع/تضييق الصورة", 
+                    function() {
+                        if (!isStretched) {
+                            playerInstance.setConfig({ stretching: "exactfit" }); 
+                            isStretched = true;
+                        } else {
+                            playerInstance.setConfig({ stretching: "uniform" });
+                            isStretched = false;
+                        }
+                    },
+                    "stretch-button"
+                );
             });
         }
 
-        function handleSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = channelsData.filter(c => c.title.toLowerCase().includes(query));
-            renderList(filtered);
+        function filterChannels() {
+            var text = document.getElementById("searchInput").value;
+            renderChannels(text);
         }
 
-        // تهيئة المشغل
-        playerInstance = jwplayer("player").setup({
-            playlist: channelsData,
-            width: "100%",
-            height: "100%",
-            autostart: true,
-            stretching: "uniform"
-        });
+        renderChannels("");
+        if(channels.length > 0) playChannel(0);
 
-        playerInstance.on('ready', function() {
-            let isStretched = false;
-            const diagonalCutArrow = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTQgMTBsNy03bS02IDBoNnY2bS0xMSA1bC03IDdtNiAwSDN2LTYiLz48L3N2Zz4=";
-            
-            playerInstance.addButton(
-                diagonalCutArrow, "توسيع/تضييق الصورة", 
-                function() {
-                    if (!isStretched) {
-                        playerInstance.setConfig({ stretching: "exactfit" }); isStretched = true;
-                    } else {
-                        playerInstance.setConfig({ stretching: "uniform" }); isStretched = false;
-                    }
-                }, "stretch-button"
-            );
-        });
-
-        // عرض القائمة الأساسية
-        renderList(channelsData);
     </script>
 </body>
 </html>
