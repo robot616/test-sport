@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live TV - Extracted Channels</title>
+    <title>Live TV - Pro Player</title>
     
     <link rel="icon" type="image/png" sizes="512x512" href="https://img.icons8.com/fluency/512/play.png">
     <meta name="apple-mobile-web-app-title" content="Sports Hub">
@@ -20,6 +20,7 @@
             overflow: hidden;
         }
         .app-container { display: flex; width: 100vw; height: 100vh; flex-direction: row; }
+        
         .sidebar {
             width: 320px; background: #181818;
             border-left: 1px solid #333; display: flex; flex-direction: column; z-index: 10;
@@ -46,7 +47,8 @@
             display: flex; align-items: center; justify-content: space-between;
         }
         .channel-btn:hover { background: #333; }
-        .channel-btn.active { background: #1dcf60; color: #fff; }
+        .channel-btn.active { background: #1dcf60; color: #000; }
+        
         .player-wrapper { flex: 1; position: relative; background: #000; }
         #player { position: absolute !important; top: 0; right: 0; bottom: 0; left: 0; width: 100% !important; height: 100% !important; }
         
@@ -56,7 +58,7 @@
             .sidebar { width: 100%; height: 60vh; border-left: none; border-top: 1px solid #333; }
         }
 
-        /* أيقونة التكبير 55% */
+        /* أيقونة التكبير الأصلية 55% */
         .jw-icon-fullscreen svg { display: none !important; }
         .jw-icon-fullscreen {
             background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNOCAzSDVhMiAyIDAgMCAwLTIgMnYzbTE4IDBWNWEyIDIgMCAwIDAtMi0yaC0zbTAgMThoM2EyIDIgMCAwIDAgMi0ydi0zTTMgMTZ2M2EyIDIgMCAwIDAgMiAyaDMiLz48L3N2Zz4=');
@@ -84,7 +86,33 @@
 
     <script>
         var channels = [ 
-            // ------------------ beIN SPORTS ------------------
+            // ------------------ الباقات الرياضية والمحلية ------------------
+            { name: "On Sport HD", url: "https://fastly.live.brightcove.com/6386028928112/us-east-1/6416013238001/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJob3N0IjoieWN3Ymx1LmVncmVzcy5zenkzeHgiLCJhY2NvdW50X2lkIjoiNjQxNjAxMzIzODAwMSIsImVobiI6ImZhc3RseS5saXZlLmJyaWdodGNvdmUuY29tIiwiaXNzIjoiYmxpdmUtcGxheWJhY2stc291cmNlLWFwaSIsInN1YiI6InBhdGhtYXB0b2tlbiIsImF1ZCI6WyI2NDE2MDEzMjM4MDAxIl0sImp0aSI6IjYzODYwMjg5MjgxMTIifQ.7pBZHXb93BJ47HBrEiPQvSquoHi92NStYSX3JKYcznQ/chunklist.m3u8", cat: "ON SPORT & KORA" },
+            { name: "On Sport Max", url: "https://fastly.live.brightcove.com/6386027187112/us-east-1/6416013238001/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJob3N0IjoieWN3Ymx1LmVncmVzcy5zenkzeHgiLCJhY2NvdW50X2lkIjoiNjQxNjAxMzIzODAwMSIsImVobiI6ImZhc3RseS5saXZlLmJyaWdodGNvdmUuY29tIiwiaXNzIjoiYmxpdmUtcGxheWJhY2stc291cmNlLWFwaSIsInN1YiI6InBhdGhtYXB0b2tlbiIsImF1ZCI6WyI2NDE2MDEzMjM4MDAxIl0sImp0aSI6IjYzODYwMjcxODcxMTIifQ.o9bQYbACQ386kDSKbOPBVYlIhCz3WFgEHI3A8Pcw3qg/chunklist.m3u8", cat: "ON SPORT & KORA" },
+            { name: "On Sport Plus", url: "https://fastly.live.brightcove.com/6384149663112/us-east-1/6416013238001/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJob3N0IjoieWN3Ymx1LmVncmVzcy5zenkzeHgiLCJhY2NvdW50X2lkIjoiNjQxNjAxMzIzODAwMSIsImVobiI6ImZhc3RseS5saXZlLmJyaWdodGNvdmUuY29tIiwiaXNzIjoiYmxpdmUtcGxheWJhY2stc291cmNlLWFwaSIsInN1YiI6InBhdGhtYXB0b2tlbiIsImF1ZCI6WyI2NDE2MDEzMjM4MDAxIl0sImp0aSI6IjYzODQxNDk2NjMxMTIifQ.0yJpNEV0ZSId11mURgeaOhXZvov07Uj-VI_0qt0LLSQ/chunklist.m3u8", cat: "ON SPORT & KORA" },
+            { name: "Kora Plus 1", url: "https://fastly.live.brightcove.com/6386030131112/us-east-1/6416013238001/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJob3N0IjoieWN3Ymx1LmVncmVzcy5zenkzeHgiLCJhY2NvdW50X2lkIjoiNjQxNjAxMzIzODAwMSIsImVobiI6ImZhc3RseS5saXZlLmJyaWdodGNvdmUuY29tIiwiaXNzIjoiYmxpdmUtcGxheWJhY2stc291cmNlLWFwaSIsInN1YiI6InBhdGhtYXB0b2tlbiIsImF1ZCI6WyI2NDE2MDEzMjM4MDAxIl0sImp0aSI6IjYzODYwMzAxMzExMTIifQ.aZa3dfTqySgbsPGs64c0_JTfvR1mKUmvdlDJ1WTeDgo/chunklist.m3u8", cat: "ON SPORT & KORA" },
+            { name: "Kora Plus 2", url: "https://fastly.live.brightcove.com/6386122937112/us-east-1/6416013238001/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJob3N0IjoieWN3Ymx1LmVncmVzcy5zenkzeHgiLCJhY2NvdW50X2lkIjoiNjQxNjAxMzIzODAwMSIsImVobiI6ImZhc3RseS5saXZlLmJyaWdodGNvdmUuY29tIiwiaXNzIjoiYmxpdmUtcGxheWJhY2stc291cmNlLWFwaSIsInN1YiI6InBhdGhtYXB0b2tlbiIsImF1ZCI6WyI2NDE2MDEzMjM4MDAxIl0sImp0aSI6IjYzODYxMjI5MzcxMTIifQ.HPPHHVyUxLnEyCqaO6AP7j1iCOBrMGE-zTe-7mV1-24/chunklist.m3u8", cat: "ON SPORT & KORA" },
+            
+            // ------------------ StarzPlay & Abu Dhabi ------------------
+            { name: "StarzPlay 1", url: "https://sps1.starzplayarabia.com/out/v1/eee188845e9543699fd24e5a9890c6e2/index.mpd", k1: "b253c726c24c7c94a3ddf9b1907e2c76", k2: "097963d6ad73c3d712a104981de0ed42", cat: "STARZPLAY & ADS" },
+            { name: "StarzPlay 2", url: "https://sps2.starzplayarabia.com/out/v1/15e7d1ffb99746dda03f71dbbbc3c08b/index.mpd", k1: "ee861edcd99093153a763a94b14c2c5a", k2: "ab3991f6a7729ba1ea4bcdba0c1ae6c0", cat: "STARZPLAY & ADS" },
+            { name: "StarzPlay 3", url: "https://sps3.starzplayarabia.com/out/v1/95528122fa434bcd948c9ed2e7afabee/index.mpd", k1: "117c29396ec6fd295880013241a466e1", k2: "3dfb883251884e66d784111877c44b13", cat: "STARZPLAY & ADS" },
+            { name: "AD Sports 1", url: "https://admn-live-cdn-lb.starzplayarabia.com/out/v1/admn_tv/abudhabi_sports_1/abudhabi_sports_1_dash_enc/index.mpd", k1: "e78769d87a41e15036a4fb8bfdf1371e", k2: "37be0375dc9fe544c3c6de6a105f7c0a", cat: "STARZPLAY & ADS" },
+            { name: "AD Sports 2", url: "https://admn-live-cdn-lb.starzplayarabia.com/out/v1/admn_tv/abudhabi_sports_2/abudhabi_sports_2_dash_enc/index.mpd", k1: "386a5e1166d9102709888c3468ce1f56", k2: "73bd0bd25a148b3a80116ecdd085ead6", cat: "STARZPLAY & ADS" },
+
+            // ------------------ MATCH! RUSSIA ------------------
+            { name: "MATCH! 🇷🇺", url: "https://video.beeline.tv/live/d/channel317.isml/manifest-stb.mpd", k1: "5e1c798b16d24dc8cbfc7819abf77b4d", k2: "4ba5d9aeba2239b425d1cf7b45474333", cat: "MATCH! RUSSIA" },
+            { name: "MATCH! ARENA 🇷🇺", url: "https://video.beeline.tv/live/d/channel512.isml/manifest-stb.mpd", k1: "9839b170b4fc384f243bffd8929b71a2", k2: "34cdd6f3e1bf6a9f9d54e9165abf8c09", cat: "MATCH! RUSSIA" },
+            { name: "MATCH! FIGHT 🇷🇺", url: "https://video.beeline.tv/live/d/channel377.isml/manifest-stb.mpd", k1: "660a37a91aa00b7e2e0bc7dca349b982", k2: "3593a4a2bfbd7d9585efff083b769cf5", cat: "MATCH! RUSSIA" },
+            { name: "MATCH! IGRA 🇷🇺", url: "https://video.beeline.tv/live/d/channel510.isml/manifest-stb.mpd", k1: "076fd3d5688d47758ecf14a8935827a8", k2: "257b7de78413814d67227f7a834aaf04", cat: "MATCH! RUSSIA" },
+            { name: "MATCH! FOOTBALL 1 🇷🇺", url: "https://video.beeline.tv/live/d/channel319.isml/manifest-stb.mpd", k1: "9145a6e0f778e61866f573d4944dd533", k2: "d02173d40515fea5c83944f21d0f3114", cat: "MATCH! RUSSIA" },
+            { name: "MATCH! FOOTBALL 2 🇷🇺", url: "https://video.beeline.tv/live/d/channel320.isml/manifest-stb.mpd", k1: "ce7cf9b28d1a8d874accebc44d7e1fcd", k2: "cda18d4d20abd5cc778315abe277feb9", cat: "MATCH! RUSSIA" },
+            { name: "MATCH! FOOTBALL 3 🇷🇺", url: "https://video.beeline.tv/live/d/channel321.isml/manifest-stb.mpd", k1: "6cfb55b12aaa9df1626a8adaa4f26329", k2: "84486e2e8e5fdee2ef8240019923078c", cat: "MATCH! RUSSIA" },
+            { name: "MATCH! PREMIERE 🇷🇺", url: "https://video.beeline.tv/live/d/channel318.isml/manifest-stb.mpd", k1: "2bb7b314771ed5eeddd8f44a9aa42740", k2: "01f2a8f11bd891655a752c1749f478ec", cat: "MATCH! RUSSIA" },
+            { name: "MATCH! STRANA 🇷🇺", url: "http://video.beeline.tv/live/d/channel304.isml/manifest-stb.mpd", k1: "dadaa697622b0ad0083acc9b6dd0c294", k2: "beb4fbc34be9b1c5ff12964830002c89", cat: "MATCH! RUSSIA" },
+            { name: "MIR BASKETBOLA 🇷🇺", url: "https://video.beeline.tv/live/d/channel423.isml/manifest-stb.mpd", k1: "a21b3a63ec7a17a8a6c5da6a48cab3d5", k2: "b33b26a922c281d2fc73d639b83ee54c", cat: "MATCH! RUSSIA" },
+
+            // ------------------ beIN SPORTS (روابط متعددة الجودة مدمجة) ------------------
             { 
                 name: "beIN SPORTS 1", cat: "beIN SPORTS", 
                 sources: [{file: "https://auto-m3u-mate.lovable.app/hls/1424.m3u8", label: "1080P"}, {file: "https://auto-m3u-mate.lovable.app/hls/4.m3u8", label: "720P"}, {file: "https://auto-m3u-mate.lovable.app/hls/24.m3u8", label: "360P"}, {file: "https://auto-m3u-mate.lovable.app/hls/44.m3u8", label: "244P"}]
@@ -375,7 +403,6 @@
                     btn.id = "btn-" + i;
                     
                     var typeBadge = "LIVE";
-                    // تحديد نوع القناة بشكل آمن (ولو فيها مصادر متعددة بنأخذ المصدر الأول كمعيار)
                     var checkUrl = channel.url || (channel.sources && channel.sources[0].file) || "";
                     
                     if (checkUrl.indexOf(".m3u8") !== -1 || checkUrl.indexOf(".ts") !== -1) typeBadge = "HLS";
@@ -405,14 +432,16 @@
             if(activeBtn) activeBtn.classList.add("active");
 
             var setupConfig = {
-                type: "hls", 
                 width: "100%", height: "100%",
                 autostart: true, preload: "auto", stretching: "uniform"
             };
 
-            // دعم الجودات المتعددة داخل ترس JW Player أو الرابط المباشر
-            if (channel.sources) {
-                setupConfig.sources = channel.sources;
+            // إعدادات الروابط والجودة للمشغل ليقرأها كـ Gear Icon
+            if (channel.sources && channel.sources.length > 0) {
+                // تمرير مصفوفة الجودات للمشغل ليعرضها في أيقونة الترس
+                setupConfig.sources = channel.sources.map(function(s) {
+                    return { file: s.file, label: s.label, type: "hls" };
+                });
             } else {
                 setupConfig.file = channel.url;
                 setupConfig.type = channel.url.indexOf(".m3u8") !== -1 || channel.url.indexOf(".ts") !== -1 ? "hls" : "dash";
