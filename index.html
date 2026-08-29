@@ -50,10 +50,44 @@
         .player-wrapper { flex: 1; position: relative; background: #000; }
         #player { position: absolute !important; top: 0; right: 0; bottom: 0; left: 0; width: 100% !important; height: 100% !important; }
         
+        /* ----------------------------------- */
+        /* قائمة الجودات المنبثقة من الترس */
+        /* ----------------------------------- */
+        .native-q-menu {
+            position: absolute;
+            bottom: 45px; /* تظهر فوق شريط البلاير مباشرة */
+            right: 55px; /* موضعها فوق أيقونة الترس */
+            background: rgba(28, 28, 28, 0.95);
+            border-radius: 6px;
+            border: 1px solid #444;
+            display: none;
+            flex-direction: column;
+            z-index: 999;
+            min-width: 100px;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.5);
+            overflow: hidden;
+            direction: ltr;
+        }
+        .native-q-btn {
+            background: transparent;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 13px;
+            cursor: pointer;
+            text-align: center;
+            border-bottom: 1px solid #333;
+            transition: background 0.2s;
+        }
+        .native-q-btn:hover { background: #3a3a3a; }
+        .native-q-btn.active { color: #1dcf60; font-weight: bold; background: #222; }
+        .native-q-btn:last-child { border-bottom: none; }
+
         @media (max-width: 768px) {
             .app-container { flex-direction: column; }
             .player-wrapper { height: 40vh; flex: none; }
             .sidebar { width: 100%; height: 60vh; border-left: none; border-top: 1px solid #333; }
+            .native-q-menu { right: 40px; }
         }
 
         /* أيقونة التكبير 55% */
@@ -71,7 +105,7 @@
 <body>
 
     <div class="app-container">
-        <div class="player-wrapper">
+        <div class="player-wrapper" id="playerWrapper">
             <div id="player"></div>
         </div>
         <div class="sidebar">
@@ -85,70 +119,22 @@
     <script>
         var channels = [ 
             // ------------------ beIN SPORTS ------------------
-            { 
-                name: "beIN SPORTS 1", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1424.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/4.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/24.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/44.m3u8", label: "244P"}]
-            },
-            { 
-                name: "beIN SPORTS 2", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1425.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/5.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/25.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/45.m3u8", label: "244P"}]
-            },
-            { 
-                name: "beIN SPORTS 3", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1426.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/6.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/26.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/46.m3u8", label: "244P"}]
-            },
-            { 
-                name: "beIN SPORTS 4", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1427.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/7.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/27.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/47.m3u8", label: "244P"}]
-            },
-            { 
-                name: "beIN SPORTS 5", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1428.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/8.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/28.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/48.m3u8", label: "244P"}]
-            },
-            { 
-                name: "beIN SPORTS 6", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1429.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/9.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/29.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/49.m3u8", label: "244P"}]
-            },
-            { 
-                name: "beIN SPORTS 7", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1430.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/10.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/30.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/50.m3u8", label: "244P"}]
-            },
-            { 
-                name: "beIN SPORTS 8", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1431.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/11.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/31.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/51.m3u8", label: "244P"}]
-            },
-            { 
-                name: "beIN SPORTS 9", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1432.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/12.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/32.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/52.m3u8", label: "244P"}]
-            },
-            { 
-                name: "beIN France 1", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1433.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/13.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/33.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/53.m3u8", label: "244P"}]
-            },
-            { 
-                name: "beIN France 2", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1434.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/14.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/34.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/54.m3u8", label: "244P"}]
-            },
-            { 
-                name: "beIN France 3", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1435.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/15.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/35.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/55.m3u8", label: "244P"}]
-            },
-            { 
-                name: "beIN English 1", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1481.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/18.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/38.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/58.m3u8", label: "244P"}]
-            },
-            { 
-                name: "beIN English 2", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1482.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/19.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/39.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/59.m3u8", label: "244P"}]
-            },
-            { 
-                name: "beIN English 3", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1483.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/20.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/40.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/80.m3u8", label: "244P"}]
-            },
-            { 
-                name: "beIN SPORTS (FTA)", cat: "beIN SPORTS", 
-                qualities: [{url: "https://auto-m3u-mate.lovable.app/hls/1437.m3u8", label: "1080P"}, {url: "https://auto-m3u-mate.lovable.app/hls/17.m3u8", label: "720P"}, {url: "https://auto-m3u-mate.lovable.app/hls/37.m3u8", label: "360P"}, {url: "https://auto-m3u-mate.lovable.app/hls/57.m3u8", label: "244P"}]
-            },
+            { name: "beIN SPORTS 1", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1424.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/4.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/24.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/44.m3u8"}] },
+            { name: "beIN SPORTS 2", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1425.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/5.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/25.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/45.m3u8"}] },
+            { name: "beIN SPORTS 3", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1426.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/6.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/26.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/46.m3u8"}] },
+            { name: "beIN SPORTS 4", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1427.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/7.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/27.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/47.m3u8"}] },
+            { name: "beIN SPORTS 5", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1428.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/8.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/28.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/48.m3u8"}] },
+            { name: "beIN SPORTS 6", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1429.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/9.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/29.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/49.m3u8"}] },
+            { name: "beIN SPORTS 7", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1430.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/10.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/30.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/50.m3u8"}] },
+            { name: "beIN SPORTS 8", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1431.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/11.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/31.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/51.m3u8"}] },
+            { name: "beIN SPORTS 9", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1432.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/12.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/32.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/52.m3u8"}] },
+            { name: "beIN France 1", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1433.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/13.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/33.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/53.m3u8"}] },
+            { name: "beIN France 2", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1434.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/14.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/34.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/54.m3u8"}] },
+            { name: "beIN France 3", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1435.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/15.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/35.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/55.m3u8"}] },
+            { name: "beIN English 1", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1481.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/18.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/38.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/58.m3u8"}] },
+            { name: "beIN English 2", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1482.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/19.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/39.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/59.m3u8"}] },
+            { name: "beIN English 3", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1483.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/20.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/40.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/80.m3u8"}] },
+            { name: "beIN SPORTS (FTA)", cat: "beIN SPORTS", qualities: [{label: "1080P", url: "https://auto-m3u-mate.lovable.app/hls/1437.m3u8"}, {label: "720P", url: "https://auto-m3u-mate.lovable.app/hls/17.m3u8"}, {label: "360P", url: "https://auto-m3u-mate.lovable.app/hls/37.m3u8"}, {label: "244P", url: "https://auto-m3u-mate.lovable.app/hls/57.m3u8"}] },
 
             // ------------------ beIN ENTERTAINMENT ------------------
             { name: "beIN Boomerang", url: "https://auto-m3u-mate.lovable.app/hls/60.m3u8", cat: "beIN ENTERTAINMENT" },
@@ -352,6 +338,8 @@
         ];
 
         var playerInstance = null;
+        var currentChannelIndex = 0;
+        var currentQualityIndex = 0;
 
         function renderChannels(filterText) {
             if (!filterText) filterText = "";
@@ -362,11 +350,10 @@
             for (var i = 0; i < channels.length; i++) {
                 var channel = channels[i];
                 if (channel.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1) {
-                    // إضافة ترويسة التصنيف
                     if (channel.cat !== currentCat && filterText === "") {
                         var catHeader = document.createElement("div");
                         catHeader.className = "category-header";
-                        catHeader.innerText = channel.cat;
+                        catHeader.innerText = channel.cat || "قنوات";
                         listContainer.appendChild(catHeader);
                         currentCat = channel.cat;
                     }
@@ -377,7 +364,6 @@
                     
                     var typeBadge = "LIVE";
                     var checkUrl = channel.url || (channel.qualities && channel.qualities[0].url) || "";
-                    
                     if (checkUrl.indexOf(".m3u8") !== -1 || checkUrl.indexOf(".ts") !== -1) typeBadge = "HLS";
                     if (checkUrl.indexOf(".mpd") !== -1) typeBadge = "DASH";
 
@@ -385,54 +371,101 @@
                                     '<span style="font-size: 10px; color: #aaa; background: #333; padding: 2px 6px; border-radius: 4px;">' + typeBadge + '</span>';
                     
                     (function(index) {
-                        btn.onclick = function() { playChannel(index); };
+                        btn.onclick = function() { playChannel(index, 0); };
                     })(i);
                     listContainer.appendChild(btn);
                 }
             }
         }
 
-        function playChannel(index) {
+        function playChannel(index, qIndex) {
             if (typeof jwplayer === 'undefined') {
                 document.getElementById('player').innerHTML = '<h3 style="color:#ff4d4d; text-align:center; margin-top:20%; font-family:tahoma;">تم حظر مشغل الفيديو!<br>يرجى إيقاف مانع الإعلانات (AdBlock).</h3>';
                 return;
             }
 
+            currentChannelIndex = index;
+            currentQualityIndex = qIndex || 0;
             var channel = channels[index];
+            var hasQualities = (channel.qualities && channel.qualities.length > 0);
+
             var allBtns = document.querySelectorAll(".channel-btn");
             for (var j = 0; j < allBtns.length; j++) { allBtns[j].classList.remove("active"); }
             var activeBtn = document.getElementById("btn-" + index);
             if(activeBtn) activeBtn.classList.add("active");
 
+            var streamUrl = "";
+            if (hasQualities) {
+                // إذا كان تلقائي (0) نعرض أعلى جودة
+                if (currentQualityIndex === 0) {
+                    streamUrl = channel.qualities[0].url; 
+                } else {
+                    streamUrl = channel.qualities[currentQualityIndex - 1].url;
+                }
+            } else {
+                streamUrl = channel.url;
+            }
+
             var setupConfig = {
+                file: streamUrl,
+                type: streamUrl.indexOf(".m3u8") !== -1 || streamUrl.indexOf(".ts") !== -1 ? "hls" : "dash",
                 width: "100%", height: "100%",
                 autostart: true, preload: "auto", stretching: "uniform"
             };
 
-            // تفعيل أيقونة الترس ⚙️ وعرض الجودات جوا المشغل
-            if (channel.qualities && channel.qualities.length > 0) {
-                setupConfig.sources = [];
-                // إضافة خيار تلقائي بناءً على أعلى جودة لتجنب الشاشات السوداء
-                setupConfig.sources.push({
-                    file: channel.qualities[0].url,
-                    label: "Auto",
-                    default: true
-                });
-                // إضافة باقي الجودات
-                for (var q = 0; q < channel.qualities.length; q++) {
-                    setupConfig.sources.push({
-                        file: channel.qualities[q].url,
-                        label: channel.qualities[q].label
-                    });
-                }
-            } else {
-                setupConfig.file = channel.url;
-                setupConfig.type = channel.url.indexOf(".m3u8") !== -1 || channel.url.indexOf(".ts") !== -1 ? "hls" : "dash";
+            if (channel.k1 && channel.k2) {
+                setupConfig.drm = { clearkey: { keyId: channel.k1, key: channel.k2 } };
             }
 
             playerInstance = jwplayer("player").setup(setupConfig);
 
             playerInstance.on('ready', function() {
+                var wrapper = document.getElementById('playerWrapper');
+                var oldMenu = document.getElementById('nativeQualityMenu');
+                if (oldMenu) oldMenu.remove();
+
+                // إضافة الترس إذا كانت القناة بها جودات متعددة
+                if (hasQualities) {
+                    var menuDiv = document.createElement('div');
+                    menuDiv.id = 'nativeQualityMenu';
+                    menuDiv.className = 'native-q-menu';
+                    
+                    var autoBtn = document.createElement('button');
+                    autoBtn.className = 'native-q-btn' + (currentQualityIndex === 0 ? ' active' : '');
+                    autoBtn.innerText = 'تلقائي (Auto)';
+                    autoBtn.onclick = function() { playChannel(currentChannelIndex, 0); };
+                    menuDiv.appendChild(autoBtn);
+
+                    channel.qualities.forEach(function(q, idx) {
+                        var actualIdx = idx + 1;
+                        var qBtn = document.createElement('button');
+                        qBtn.className = 'native-q-btn' + (actualIdx === currentQualityIndex ? ' active' : '');
+                        qBtn.innerText = q.label;
+                        qBtn.onclick = function() {
+                            playChannel(currentChannelIndex, actualIdx);
+                        };
+                        menuDiv.appendChild(qBtn);
+                    });
+                    wrapper.appendChild(menuDiv);
+
+                    var gearSvgBase64 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMyI+PC9jaXJjbGU+PHBhdGggZD0iTTE5LjQgMTVhMS42NSAxLjY1IDAgMCAwIC4zMyAxLjgybC4wNi4wNmEyIDIgMCAwIDEgMCAyLjgzIDIgMiAwIDAgMS0yLjgzIDBsLS4wNi0uMDZhMS42NSAxLjY1IDAgMCAwLTEuODItLjMzIDEuNjUgMS42NSAwIDAgMC0xIDEuNTFWMjFhMiAyIDAgMCAxLTIgMiAyIDIgMCAwIDEtMi0ydi0uMDlBMS42NSAxLjY1IDAgMCAwIDkgMTkuNGExLjY1IDEuNjUgMCAwIDAtMS44Mi4zM2wtLjA2LjA2YTIgMiAwIDAgMS0yLjgzIDAgMiAyIDAgMCAxIDAtMi44M2wuMDYtLjA2YTEuNjUgMS42NSAwIDAgMCAuMzMtMS44MiAxLjY1IDEuNjUgMCAwIDAtMS41MS0xSDNhMiAyIDAgMCAxLTItMiAyIDIgMCAwIDEgMi0yaC4wOUExLjY1IDEuNjUgMCAwIDAgNC42IDlhMS42NSAxLjY1IDAgMCAwLS4zMy0xLjgybC0uMDYtLjA2YTIgMiAwIDAgMSAwLTIuODMgMiAyIDAgMCAxIDIuODMgMGwuMDYuMDZhMS42NSAxLjY1IDAgMCAwIDEuODIuMzNIOWExLjY1IDEuNjUgMCAwIDAgMS0xLjUxVjNhMiAyIDAgMCAxIDItMiAyIDIgMCAwIDEgMiAydi4wOWExLjY1IDEuNjUgMCAwIDAgMSAxLjUxIDEuNjUgMS42NSAwIDAgMCAxLjgyLS4zM2wuMDYtLjA2YTIgMiAwIDAgMSAyLjgzIDAgMiAyIDAgMCAxIDAgMi44M2wtLjA2LjA2YTEuNjUgMS42NSAwIDAgMC0uMzMgMS44MlY5YTEuNjUgMS42NSAwIDAgMCAxLjUxIDFIMjFhMiAyIDAgMCAxIDIgMiAyIDIgMCAwIDEtMiAyaC0uMDlhMS42NSAxLjY1IDAgMCAwLTEuNTEgMXoiPjwvcGF0aD48L3N2Zz4=";
+                    
+                    playerInstance.addButton(
+                        gearSvgBase64, 
+                        "الجودة", 
+                        function() {
+                            var menu = document.getElementById('nativeQualityMenu');
+                            menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+                        }, 
+                        "quality-gear-btn"
+                    );
+
+                    playerInstance.on('displayClick', function() {
+                        var menu = document.getElementById('nativeQualityMenu');
+                        if(menu) menu.style.display = 'none';
+                    });
+                }
+
                 var isStretched = false;
                 var diagonalCutArrow = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTQgMTBsNy03bS02IDBoNnY2bS0xMSA1bC03IDdtNiAwSDN2LTYiLz48L3N2Zz4=";
 
@@ -459,7 +492,7 @@
         }
 
         renderChannels("");
-        if(channels.length > 0) playChannel(0);
+        if(channels.length > 0) playChannel(0, 0);
 
     </script>
 </body>
